@@ -613,7 +613,19 @@
       "email": "muhammedfazilchengapra@gmail.com"
     }
   ],
-  "cart": [],
+  "cart": [
+    {
+      "id": "a003",
+      "productId": "17",
+      "productName": "Stan Smith",
+      "price": 8499,
+      "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=400&h=400&fit=crop",
+      "quantity": 1,
+      "size": 7,
+      "color": "White",
+      "userId": "bb94"
+    }
+  ],
   "wishlist": [
     {
       "id": "4504",

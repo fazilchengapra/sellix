@@ -1,0 +1,95 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
+import { loginSchema } from '../lib/validations';
+
+const Login = () => {
+  const [formData, setFormData] = useState({ email: '' });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const { login } = useAuth();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrors({});
+
+    // Validate with Zod
+    const result = loginSchema.safeParse(formData);
+    
+    if (!result.success) {
+      const fieldErrors: { [key: string]: string } = {};
+      result.error.issues.forEach((issue) => {
+        if (issue.path[0]) {
+          fieldErrors[issue.path[0].toString()] = issue.message;
+        }
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    const success = await login(result.data.email);
+    if (success) {
+      showToast("Login successful! Welcome back", "success");
+      navigate('/');
+    } else {
+      setErrors({ email: "Invalid credentials or user not found" });
+      showToast("Invalid credentials or user not found", "error");
+    }
+  };
+
+  return (
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center pt-16 px-4">
+      <div className="max-w-md w-full bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-100">
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+        <p className="text-gray-500 mb-8">Please enter your details to sign in</p>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={formData.email}
+              onChange={(e) => {
+                setFormData({ email: e.target.value });
+                if (errors.email) {
+                    const newErrors = { ...errors };
+                    delete newErrors.email;
+                    setErrors(newErrors);
+                }
+              }}
+              className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all ${
+                errors.email ? 'border-red-500' : 'border-gray-200'
+              }`}
+              placeholder="john@example.com"
+            />
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+          >
+            Sign In
+          </button>
+        </form>
+
+        <p className="mt-8 text-center text-sm text-gray-600">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-blue-600 font-medium hover:underline">
+            Create account
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
+
