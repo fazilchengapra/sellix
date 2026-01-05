@@ -1,14 +1,5 @@
-import { ElementType } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from './Button';
-
-interface EmptyStateProps {
-  icon: ElementType;
-  title: string;
-  description: string;
-  actionLabel?: string;
-  actionLink?: string;
-}
 
 export const EmptyState = ({ 
   icon: Icon, 
@@ -16,7 +7,7 @@ export const EmptyState = ({
   description, 
   actionLabel, 
   actionLink 
-}: EmptyStateProps) => {
+}) => {
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
       <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">

@@ -6,12 +6,12 @@ import { registerSchema } from '../lib/validations';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '' });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState({});
   const { register } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
 
@@ -19,7 +19,7 @@ const Register = () => {
     const result = registerSchema.safeParse(formData);
     
     if (!result.success) {
-      const fieldErrors: { [key: string]: string } = {};
+      const fieldErrors = {};
       result.error.issues.forEach((issue) => {
         if (issue.path[0]) {
           fieldErrors[issue.path[0].toString()] = issue.message;
@@ -39,7 +39,7 @@ const Register = () => {
     }
   };
 
-  const updateField = (field: keyof typeof formData, value: string) => {
+  const updateField = (field, value) => {
     setFormData({ ...formData, [field]: value });
     if (errors[field]) {
       setErrors((prev) => {
@@ -115,4 +115,3 @@ const Register = () => {
 };
 
 export default Register;
-

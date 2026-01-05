@@ -1,11 +1,6 @@
-import { forwardRef, HTMLAttributes, ReactNode } from 'react';
+import { forwardRef } from 'react';
 
-interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'outline';
-  children?: ReactNode;
-}
-
-const Badge = forwardRef<HTMLSpanElement, BadgeProps>(({ 
+const Badge = forwardRef(({ 
   className = '', 
   variant = 'primary', 
   children, 

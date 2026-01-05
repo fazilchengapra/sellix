@@ -1,14 +1,6 @@
-import { ElementType } from 'react';
 import { Link } from 'react-router-dom';
 
-interface NavIconLinkProps {
-  to: string;
-  icon: ElementType;
-  count?: number;
-  label?: string;
-}
-
-export const NavIconLink = ({ to, icon: Icon, count, label }: NavIconLinkProps) => {
+export const NavIconLink = ({ to, icon: Icon, count, label }) => {
   return (
     <Link 
       to={to} 

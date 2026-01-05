@@ -1,21 +1,11 @@
-import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import api from '../api/axios';
 import { useAuth } from './AuthContext';
-import { CartItem } from '../types';
 
-interface CartContextType {
-  cart: CartItem[];
-  addToCart: (item: Omit<CartItem, 'id' | 'userId'>) => Promise<void>;
-  removeFromCart: (id: string) => Promise<void>;
-  updateQuantity: (id: string, quantity: number) => Promise<void>;
-  clearCart: () => Promise<void>;
-  total: number;
-}
+const CartContext = createContext(undefined);
 
-const CartContext = createContext<CartContextType | undefined>(undefined);
-
-export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [cart, setCart] = useState<CartItem[]>([]);
+export const CartProvider = ({ children }) => {
+  const [cart, setCart] = useState([]);
   const { user } = useAuth();
 
   const fetchCart = async () => {
@@ -37,7 +27,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
 
-  const addToCart = async (item: Omit<CartItem, 'id' | 'userId'>) => {
+  const addToCart = async (item) => {
     if (!user) {
         // Ideally show toast here or redirect
         return;
@@ -59,7 +49,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const updateQuantity = async (id: string, quantity: number) => {
+  const updateQuantity = async (id, quantity) => {
     if (quantity < 1) return;
     const item = cart.find(i => i.id === id);
     if (!item) return;
@@ -73,7 +63,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const removeFromCart = async (id: string) => {
+  const removeFromCart = async (id) => {
     try {
       await api.delete(`/cart/${id}`);
       setCart(prev => prev.filter(item => item.id !== id));
@@ -90,7 +80,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
+  
   return (
     <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, total }}>
       {children}
@@ -105,4 +95,3 @@ export const useCart = () => {
   }
   return context;
 };
-

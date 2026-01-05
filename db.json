@@ -615,10 +615,10 @@
   ],
   "cart": [
     {
-      "id": "a003",
-      "productId": "17",
-      "productName": "Stan Smith",
-      "price": 8499,
+      "id": "2968",
+      "productId": "2",
+      "productName": "SuperStar Classic",
+      "price": 3599,
       "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=400&h=400&fit=crop",
       "quantity": 1,
       "size": 7,
@@ -626,16 +626,7 @@
       "userId": "bb94"
     }
   ],
-  "wishlist": [
-    {
-      "id": "4504",
-      "productId": "1",
-      "productName": "AirFlex Runner",
-      "price": 3999,
-      "image": "https://i.pinimg.com/1200x/9b/07/fd/9b07fd15394d1fd5a9d0c476c3f187c8.jpg",
-      "userId": "bb94"
-    }
-  ],
+  "wishlist": [],
   "orders": [
     {
       "id": "c6ad",

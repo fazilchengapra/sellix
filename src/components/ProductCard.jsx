@@ -1,21 +1,23 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import { formatPrice } from '../lib/utils';
 import { ShoppingBag, Star } from 'lucide-react';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import { Product } from '../types';
+import { useAuth } from '../context/AuthContext';
 
-export const ProductCard = ({ product }: { product: Product }) => {
+export const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const { showToast } = useToast();
+  const {user} = useAuth()
 
   const image = product.colors?.[0]?.images?.[0] || '';
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if(!user) return showToast('Please Login and try again', 'warning')
     addToCart({ 
         productId: product.id, 
         productName: product.name, 
@@ -30,7 +32,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
 
   return (
     <Card className="group h-full flex flex-col transition-all hover:shadow-xl border border-gray-100">
-      <Link to={`/product/${product.id}`} className="block relative aspect-[4/5] bg-gray-50 overflow-hidden">
+      <Link to={`/product/${product.id}`} className="block relative aspect-4/5 bg-gray-50 overflow-hidden">
         <img 
           src={image} 
           alt={product.name} 
@@ -60,11 +62,11 @@ export const ProductCard = ({ product }: { product: Product }) => {
             <div className="flex items-center gap-2">
               {product.discount > 0 ? (
                 <>
-                  <span className="text-lg font-bold text-blue-600">${product.finalPrice}</span>
-                  <span className="text-sm text-gray-400 line-through">${product.price}</span>
+                  <span className="text-lg font-bold text-blue-600">{formatPrice(product.finalPrice)}</span>
+                  <span className="text-sm text-gray-400 line-through">{formatPrice(product.price)}</span>
                 </>
               ) : (
-                <span className="text-lg font-bold text-gray-900">${product.price}</span>
+                <span className="text-lg font-bold text-gray-900">{formatPrice(product.price)}</span>
               )}
             </div>
           </div>

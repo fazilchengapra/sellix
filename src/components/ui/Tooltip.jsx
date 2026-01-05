@@ -1,11 +1,4 @@
-import { ReactNode } from 'react';
-
-interface TooltipProps {
-  content: string;
-  children: ReactNode;
-}
-
-const Tooltip = ({ content, children }: TooltipProps) => {
+const Tooltip = ({ content, children }) => {
   return (
     <div className="relative group inline-block">
       {children}

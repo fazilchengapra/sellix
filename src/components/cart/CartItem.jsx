@@ -1,9 +1,10 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
+import { formatPrice } from '../../lib/utils';
 import { useCart } from '../../context/CartContext';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 
-export const CartItem = ({ item }: any) => {
+export const CartItem = ({ item }) => {
   const { updateQuantity, removeFromCart } = useCart();
 
   return (
@@ -35,7 +36,7 @@ export const CartItem = ({ item }: any) => {
                )}
             </div>
           </div>
-          <p className="font-semibold text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
+          <p className="font-semibold text-gray-900">{formatPrice(item.price * item.quantity)}</p>
         </div>
 
         <div className="flex justify-between items-center mt-4">

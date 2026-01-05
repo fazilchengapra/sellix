@@ -3,23 +3,13 @@ import {
   useState,
   useContext,
   useEffect,
-  ReactNode,
 } from "react";
 import api from "../api/axios";
-import { User } from "../types";
 
-interface AuthContextType {
-  user: User | null;
-  login: (email: string) => Promise<boolean>;
-  register: (name: string, email: string) => Promise<boolean>;
-  logout: () => void;
-  isAuthenticated: boolean;
-}
+const AuthContext = createContext(undefined);
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -29,7 +19,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const login = async (email: string) => {
+  const login = async (email) => {
     try {
       const response = await api.get(`/users?email=${email}`);
       if (response.data.length > 0) {
@@ -45,7 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (name: string, email: string) => {
+  const register = async (name, email) => {
     try {
       const checkUser = await api.get(`/users?email=${email}`);
       if (checkUser.data.length > 0) {
@@ -85,4 +75,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

@@ -1,15 +1,7 @@
 import { Link } from 'react-router-dom';
 import { LogOut, Home, Package } from 'lucide-react';
-import { User } from '../../types';
 
-interface MobileMenuProps {
-  isOpen: boolean;
-  user: User | null;
-  onLogout: () => void;
-  onClose: () => void;
-}
-
-export const MobileMenu = ({ isOpen, user, onLogout, onClose }: MobileMenuProps) => {
+export const MobileMenu = ({ isOpen, user, onLogout, onClose }) => {
   if (!isOpen) return null;
 
   return (

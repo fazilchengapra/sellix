@@ -6,12 +6,12 @@ import { loginSchema } from '../lib/validations';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '' });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState({});
   const { login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
 
@@ -19,7 +19,7 @@ const Login = () => {
     const result = loginSchema.safeParse(formData);
     
     if (!result.success) {
-      const fieldErrors: { [key: string]: string } = {};
+      const fieldErrors = {};
       result.error.issues.forEach((issue) => {
         if (issue.path[0]) {
           fieldErrors[issue.path[0].toString()] = issue.message;
@@ -92,4 +92,3 @@ const Login = () => {
 };
 
 export default Login;
-

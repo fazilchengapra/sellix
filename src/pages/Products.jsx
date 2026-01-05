@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import { ProductCard } from '../components/ProductCard';
 import { Spinner } from '../components/ui/Spinner';
-import { Product } from '../types';
 
 const Products = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,4 +44,3 @@ const Products = () => {
 };
 
 export default Products;
-

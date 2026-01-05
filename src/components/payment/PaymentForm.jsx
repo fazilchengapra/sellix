@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { formatPrice } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
@@ -17,10 +18,10 @@ export const PaymentForm = () => {
     expiry: '',
     cvv: ''
   });
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
     setIsProcessing(true);
@@ -28,7 +29,7 @@ export const PaymentForm = () => {
     const result = paymentSchema.safeParse(formData);
 
     if (!result.success) {
-      const fieldErrors: { [key: string]: string } = {};
+      const fieldErrors = {};
       result.error.issues.forEach((issue) => {
         if (issue.path[0]) fieldErrors[issue.path[0].toString()] = issue.message;
       });
@@ -45,7 +46,7 @@ export const PaymentForm = () => {
     navigate('/orders');
   };
 
-  const updateField = (field: keyof typeof formData, value: string) => {
+  const updateField = (field, value) => {
     setFormData({ ...formData, [field]: value });
     if (errors[field]) {
         const newErrors = { ...errors };
@@ -94,11 +95,10 @@ export const PaymentForm = () => {
       </div>
 
       <Button type="submit" className="w-full py-4 text-lg" isLoading={isProcessing}>
-        Pay ${total.toFixed(2)}
+        Pay {formatPrice(total)}
       </Button>
     </form>
   );
 };
 
 export default PaymentForm;
-

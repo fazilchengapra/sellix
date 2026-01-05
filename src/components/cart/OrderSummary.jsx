@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { formatPrice } from '../../lib/utils';
 import { useCart } from '../../context/CartContext';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -7,7 +8,8 @@ export const OrderSummary = () => {
   const { total } = useCart();
   const navigate = useNavigate();
 
-  const shipping = total > 100 ? 0 : 10;
+  const shipping = total > 5000 ? 0 : 50;
+  
   const finalTotal = total + shipping;
 
   return (
@@ -17,16 +19,16 @@ export const OrderSummary = () => {
       <div className="space-y-4 mb-6">
         <div className="flex justify-between text-gray-600">
           <span>Subtotal</span>
-          <span>${total.toFixed(2)}</span>
+          <span>{formatPrice(total)}</span>
         </div>
         <div className="flex justify-between text-gray-600">
           <span>Shipping</span>
-          <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
+          <span>{shipping === 0 ? 'Free' : formatPrice(shipping)}</span>
         </div>
         
         <div className="border-t border-gray-100 pt-4 flex justify-between font-bold text-lg text-gray-900">
           <span>Total</span>
-          <span>${finalTotal.toFixed(2)}</span>
+          <span>{formatPrice(finalTotal)}</span>
         </div>
       </div>
 
@@ -38,7 +40,7 @@ export const OrderSummary = () => {
       </Button>
       
       <p className="mt-4 text-xs text-center text-gray-500">
-        Free shipping on orders over $100
+        Free shipping on orders over ₹5000
       </p>
     </Card>
   );

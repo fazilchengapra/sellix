@@ -5,10 +5,9 @@ import Hero from '../components/Hero';
 import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/Button';
 import api from '../api/axios';
-import { Product } from '../types';
 
 const Home = () => {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -58,4 +57,3 @@ const Home = () => {
 };
 
 export default Home;
-

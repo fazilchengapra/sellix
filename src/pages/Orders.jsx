@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { formatPrice } from '../lib/utils';
 import { Package } from 'lucide-react';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
@@ -6,11 +7,10 @@ import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Spinner } from '../components/ui/Spinner';
 import { EmptyState } from '../components/ui/EmptyState';
-import { Order } from '../types';
 
 const Orders = () => {
   const { user } = useAuth();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -86,7 +86,7 @@ const Orders = () => {
                             <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                           </div>
                        </div>
-                       <p className="font-semibold">${item.price}</p>
+                       <p className="font-semibold">{formatPrice(item.price)}</p>
                    </div>
                ))}
             </div>
@@ -94,7 +94,7 @@ const Orders = () => {
             <div className="mt-6 flex justify-end">
                 <div className="text-right">
                     <p className="text-sm text-gray-500">Total Amount</p>
-                    <p className="text-xl font-bold text-blue-600">${order.total}</p>
+                    <p className="text-xl font-bold text-blue-600">{formatPrice(order.total)}</p>
                 </div>
             </div>
           </Card>
@@ -105,4 +105,3 @@ const Orders = () => {
 };
 
 export default Orders;
-

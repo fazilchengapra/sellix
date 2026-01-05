@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { formatPrice } from '../lib/utils';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Heart, ArrowLeft, Star, Share2 } from 'lucide-react';
 import api from '../api/axios';
@@ -7,7 +8,7 @@ import { useWishlist } from '../context/WishlistContext';
 import { Button } from '../components/ui/Button';
 import { Spinner } from '../components/ui/Spinner';
 import { useToast } from '../context/ToastContext';
-import { Product } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -15,11 +16,12 @@ const ProductDetails = () => {
   const { addToCart } = useCart();
   const { wishlist, addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { showToast } = useToast();
+  const {user} = useAuth()
   
-  const [product, setProduct] = useState<Product | null>(null);
+  const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedSize, setSelectedSize] = useState<number | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
 
   useEffect(() => {
     fetchProduct();
@@ -28,7 +30,7 @@ const ProductDetails = () => {
   const fetchProduct = async () => {
     try {
       const response = await api.get(`/products/${id}`);
-      const data: Product = response.data;
+      const data = response.data;
       setProduct(data);
       if (data.sizes?.length > 0) setSelectedSize(data.sizes[0].size);
       if (data.colors?.length > 0) setSelectedColor(data.colors[0].colorName);
@@ -46,6 +48,7 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = () => {
+    if(!user) return showToast('Please login, then try again', 'warning')
     if (!product || !selectedSize || !selectedColor) return;
     
     addToCart({ 
@@ -121,9 +124,9 @@ const toggleWishlist = () => {
                 </div>
              </div>
              <div className="text-right">
-                <p className="text-3xl font-bold text-gray-900">${product.finalPrice}</p>
+                <p className="text-3xl font-bold text-gray-900">{formatPrice(product.finalPrice)}</p>
                 {product.discount > 0 && (
-                    <p className="text-sm text-gray-400 line-through">${product.price}</p>
+                    <p className="text-sm text-gray-400 line-through">{formatPrice(product.price)}</p>
                 )}
              </div>
           </div>
@@ -196,4 +199,3 @@ const toggleWishlist = () => {
 };
 
 export default ProductDetails;
-

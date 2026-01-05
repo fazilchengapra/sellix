@@ -19,11 +19,11 @@ export const ToastContainer = () => {
   };
 
   return (
-    <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
+    <div className="fixed top-4 right-4 z-100 flex flex-col gap-2 pointer-events-none">
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`pointer-events-auto flex items-start gap-3 min-w-[300px] max-w-sm p-4 rounded-xl border shadow-lg shadow-gray-200/50 animate-in slide-in-from-right-full duration-300 ${styles[toast.type] || styles.info}`}
+          className={`pointer-events-auto flex items-start gap-3 min-w-75 max-w-sm p-4 rounded-xl border shadow-lg shadow-gray-200/50 animate-in slide-in-from-right-full duration-300 ${styles[toast.type] || styles.info}`}
         >
           <div className="shrink-0 mt-0.5">
             {icons[toast.type] || icons.info}
@@ -44,4 +44,3 @@ export const ToastContainer = () => {
 };
 
 export default ToastContainer;
-

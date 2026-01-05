@@ -1,4 +1,5 @@
 import { Heart, ShoppingCart, Trash2 } from 'lucide-react';
+import { formatPrice } from '../lib/utils';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -47,7 +48,7 @@ const Wishlist = () => {
              
              <div className="p-4">
                <h3 className="font-semibold text-gray-900 truncate">{item.productName}</h3>
-               <p className="text-gray-500 text-sm mt-1 mb-4">${item.price}</p>
+               <p className="text-gray-500 text-sm mt-1 mb-4">{formatPrice(item.price)}</p>
                
                <Button 
                 className="w-full" 
@@ -74,4 +75,3 @@ const Wishlist = () => {
 };
 
 export default Wishlist;
-

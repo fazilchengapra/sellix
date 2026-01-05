@@ -1,19 +1,11 @@
-import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import api from '../api/axios';
 import { useAuth } from './AuthContext';
-import { WishlistItem } from '../types';
 
-interface WishlistContextType {
-  wishlist: WishlistItem[];
-  addToWishlist: (item: Partial<WishlistItem> & { productId: string }) => Promise<void>;
-  removeFromWishlist: (id: string) => Promise<void>;
-  isInWishlist: (productId: string) => boolean;
-}
+const WishlistContext = createContext(undefined);
 
-const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
-
-export const WishlistProvider = ({ children }: { children: ReactNode }) => {
-  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+export const WishlistProvider = ({ children }) => {
+  const [wishlist, setWishlist] = useState([]);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -34,7 +26,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const addToWishlist = async (item: Partial<WishlistItem> & { productId: string }) => {
+  const addToWishlist = async (item) => {
     if (!user) return;
     
     if (isInWishlist(item.productId)) {
@@ -50,7 +42,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const removeFromWishlist = async (id: string) => {
+  const removeFromWishlist = async (id) => {
     try {
       await api.delete(`/wishlist/${id}`);
       setWishlist(prev => prev.filter(item => item.id !== id));
@@ -59,7 +51,7 @@ export const WishlistProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const isInWishlist = (productId: string) => {
+  const isInWishlist = (productId) => {
       return wishlist.some(item => item.productId === productId);
   }
 
@@ -77,4 +69,3 @@ export const useWishlist = () => {
   }
   return context;
 };
-
