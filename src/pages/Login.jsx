@@ -1,15 +1,32 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { loginSchema } from '../lib/validations';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { loginSchema } from "../lib/validations";
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '' });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const { login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+
+  const labels = [
+    {
+      label: "email",
+      type: "email",
+      id: "email",
+      name: "email",
+      placeholder: "Enter your email",
+    },
+    {
+      label: "password",
+      type: "text",
+      id: "password",
+      name: "password",
+      placeholder: "Enter your password...",
+    },
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,7 +34,7 @@ const Login = () => {
 
     // Validate with Zod
     const result = loginSchema.safeParse(formData);
-    
+
     if (!result.success) {
       const fieldErrors = {};
       result.error.issues.forEach((issue) => {
@@ -29,10 +46,10 @@ const Login = () => {
       return;
     }
 
-    const success = await login(result.data.email);
+    const success = await login(result.data.email, result.data.password);
     if (success) {
       showToast("Login successful! Welcome back", "success");
-      navigate('/');
+      navigate("/");
     } else {
       setErrors({ email: "Invalid credentials or user not found" });
       showToast("Invalid credentials or user not found", "error");
@@ -43,34 +60,39 @@ const Login = () => {
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center pt-16 px-4">
       <div className="max-w-md w-full bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-gray-100">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-        <p className="text-gray-500 mb-8">Please enter your details to sign in</p>
+        <p className="text-gray-500 mb-8">
+          Please enter your details to sign in
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={formData.email}
-              onChange={(e) => {
-                setFormData({ email: e.target.value });
-                if (errors.email) {
-                    const newErrors = { ...errors };
-                    delete newErrors.email;
-                    setErrors(newErrors);
-                }
-              }}
-              className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all ${
-                errors.email ? 'border-red-500' : 'border-gray-200'
-              }`}
-              placeholder="john@example.com"
-            />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-            )}
-          </div>
+          {labels.map((e) => (
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {e.label}
+              </label>
+              <input
+                type={e.type}
+                id={e.id}
+                value={formData[e.name]}
+                onChange={(ev) => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    [e.name]: ev.target.value,
+                  }));
+                }}
+                className={`w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all ${
+                  errors.email ? "border-red-500" : "border-gray-200"
+                }`}
+                placeholder="john@example.com"
+              />
+              {errors[e.name] && (
+                <p className="mt-1 text-sm text-red-600">{errors[e.name]}</p>
+              )}
+            </div>
+          ))}
 
           <button
             type="submit"
@@ -81,8 +103,11 @@ const Login = () => {
         </form>
 
         <p className="mt-8 text-center text-sm text-gray-600">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-blue-600 font-medium hover:underline">
+          Don't have an account?{" "}
+          <Link
+            to="/register"
+            className="text-blue-600 font-medium hover:underline"
+          >
             Create account
           </Link>
         </p>

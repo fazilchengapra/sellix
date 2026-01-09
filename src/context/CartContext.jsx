@@ -50,6 +50,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const updateQuantity = async (id, quantity) => {
+    
     if (quantity < 1) return;
     const item = cart.find(i => i.id === id);
     if (!item) return;

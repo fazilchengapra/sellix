@@ -3,13 +3,16 @@ import { formatPrice } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { paymentSchema } from '../../lib/validations';
+import api from '../../api/axios';
 
 export const PaymentForm = () => {
-  const { clearCart, total } = useCart();
+  const { clearCart, total, cart } = useCart();
   const { showToast } = useToast();
+  const { user } = useAuth();
   const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
@@ -20,6 +23,9 @@ export const PaymentForm = () => {
   });
   const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const shipping = total > 5000 ? 0 : 50;
+  const finalTotal = total + shipping;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,13 +43,35 @@ export const PaymentForm = () => {
       setIsProcessing(false);
       return;
     }
-
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    await clearCart();
-    showToast("Payment successful! Order placed.", "success");
-    navigate('/orders');
+    if (!user) {
+        showToast("You must be logged in to place an order.", "error");
+        setIsProcessing(false);
+        return;
+    }
+
+    const orderData = {
+        userId: user.id,
+        items: cart,
+        total: finalTotal,
+        shipping: shipping,
+        subtotal: total,
+        status: 'Processing',
+        createdAt: new Date().toISOString(),
+        paymentMethod: 'Card', 
+        cardName: formData.cardName // saving card name for reference, avoiding sensitive data
+    };
+
+    try {
+        await api.post('/orders', orderData);
+        await clearCart();
+        showToast("Payment successful! Order placed.", "success");
+        navigate('/orders');
+    } catch (error) {
+        console.error("Order placement error", error);
+        showToast("Failed to place order. Please try again.", "error");
+        setIsProcessing(false);
+    }
   };
 
   const updateField = (field, value) => {
@@ -95,7 +123,7 @@ export const PaymentForm = () => {
       </div>
 
       <Button type="submit" className="w-full py-4 text-lg" isLoading={isProcessing}>
-        Pay {formatPrice(total)}
+        Pay {formatPrice(finalTotal)}
       </Button>
     </form>
   );

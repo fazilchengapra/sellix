@@ -10,6 +10,7 @@ const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -17,13 +18,16 @@ export const AuthProvider = ({ children }) => {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
     }
+    setLoading(false);
   }, []);
 
-  const login = async (email) => {
+  const login = async (email, pass) => {
     try {
       const response = await api.get(`/users?email=${email}`);
       if (response.data.length > 0) {
         const loggedInUser = response.data[0];
+      if(!loggedInUser.password || loggedInUser.password !== pass) return false
+        
         setUser(loggedInUser);
         localStorage.setItem("user", JSON.stringify(loggedInUser));
         return true;
@@ -35,14 +39,14 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email) => {
+  const register = async (name, email, password) => {
     try {
       const checkUser = await api.get(`/users?email=${email}`);
       if (checkUser.data.length > 0) {
         return false; // User already exists
       }
 
-      const newUser = { name, email }; 
+      const newUser = { name, email, password }; 
 
       const response = await api.post("/users", newUser);
       setUser(response.data);
@@ -61,7 +65,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, isAuthenticated: !!user }}
+      value={{ user, login, register, logout, isAuthenticated: !!user, loading }}
     >
       {children}
     </AuthContext.Provider>

@@ -27,7 +27,11 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group" onClick={closeMenu}>
+          <Link
+            to="/"
+            className="flex items-center space-x-2 group"
+            onClick={closeMenu}
+          >
             <div className="w-8 h-8 bg-linear-to-br from-blue-600 to-blue-400 rounded-lg flex items-center justify-center">
               <Package className="w-5 h-5 text-white" />
             </div>
@@ -38,23 +42,42 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+            <Link
+              to="/"
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
               Home
             </Link>
-            <Link to="/products" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+            <Link
+              to="/products"
+              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+            >
               Products
             </Link>
             {user && (
-              <Link to="/orders" className="text-gray-700 hover:text-blue-600 transition-colors font-medium">
+              <Link
+                to="/orders"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              >
                 Orders
               </Link>
             )}
-            
+
             <div className="flex items-center space-x-4 border-l pl-6 border-gray-200">
               {user ? (
                 <>
-                  <NavIconLink to="/wishlist" icon={Heart} count={wishlist.length} label="Wishlist" />
-                  <NavIconLink to="/cart" icon={ShoppingCart} count={cart.length} label="Cart" />
+                  <NavIconLink
+                    to="/wishlist"
+                    icon={Heart}
+                    count={wishlist.length}
+                    label="Wishlist"
+                  />
+                  <NavIconLink
+                    to="/cart"
+                    icon={ShoppingCart}
+                    count={cart.length}
+                    label="Cart"
+                  />
                   <button
                     onClick={handleLogout}
                     className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
@@ -85,17 +108,31 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-3">
-             {user && (
-                <>
-                   <NavIconLink to="/wishlist" icon={Heart} count={wishlist.length} label="Wishlist" />
-                   <NavIconLink to="/cart" icon={ShoppingCart} count={cart.length} label="Cart" />
-                </>
-             )}
+            {user && (
+              <>
+                <NavIconLink
+                  to="/wishlist"
+                  icon={Heart}
+                  count={wishlist.length}
+                  label="Wishlist"
+                />
+                <NavIconLink
+                  to="/cart"
+                  icon={ShoppingCart}
+                  count={cart.length}
+                  label="Cart"
+                />
+              </>
+            )}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>

@@ -608,109 +608,59 @@
   ],
   "users": [
     {
-      "id": "bb94",
+      "id": "0360",
       "name": "MUHAMMED FAZIL C",
-      "email": "muhammedfazilchengapra@gmail.com"
+      "email": "muhammedfazilchengapra@gmail.com",
+      "password": "123456"
     }
   ],
   "cart": [
     {
-      "id": "2968",
-      "productId": "2",
-      "productName": "SuperStar Classic",
-      "price": 3599,
-      "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=400&h=400&fit=crop",
+      "id": "77ce",
+      "productId": "3",
+      "productName": "Zoom Freak 4",
+      "price": 10500,
+      "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
       "quantity": 1,
-      "size": 7,
-      "color": "White",
+      "size": 8,
+      "color": "Red",
+      "userId": "7fe5"
+    }
+  ],
+  "wishlist": [
+    {
+      "id": "d97c",
+      "productId": "1",
+      "productName": "AirFlex Runner",
+      "price": 3999,
+      "image": "https://i.pinimg.com/1200x/9b/07/fd/9b07fd15394d1fd5a9d0c476c3f187c8.jpg",
       "userId": "bb94"
     }
   ],
-  "wishlist": [],
   "orders": [
     {
-      "id": "c6ad",
+      "id": "7c7c",
       "userId": "bb94",
       "items": [
         {
-          "id": "7e7b",
-          "productId": "8",
-          "productName": "Chuck Taylor All Star",
-          "price": 4299,
-          "image": "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=400&h=400&fit=crop",
-          "quantity": 1,
-          "size": 7,
-          "color": "Black",
-          "userId": "bb94"
-        }
-      ],
-      "total": 4299,
-      "paymentMethod": "card",
-      "status": "completed",
-      "createdAt": "2025-12-31T00:47:54.864Z"
-    },
-    {
-      "id": "6b57",
-      "userId": "bb94",
-      "items": [
-        {
-          "id": "6e38",
-          "productId": "5",
-          "productName": "Air Force 1",
-          "price": 7380,
-          "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&h=400&fit=crop",
-          "quantity": 1,
-          "size": 8,
-          "color": "White",
-          "userId": "bb94"
-        }
-      ],
-      "total": 7380,
-      "paymentMethod": "card",
-      "status": "completed",
-      "createdAt": "2025-12-31T01:10:56.037Z"
-    },
-    {
-      "id": "d659",
-      "userId": "bb94",
-      "items": [
-        {
-          "id": "1edd",
-          "productId": "9",
-          "productName": "Suede Classic",
-          "price": 4799,
-          "image": "https://images.unsplash.com/photo-1539185441755-769473a23570?w=400&h=400&fit=crop",
-          "quantity": 1,
-          "size": 8,
-          "color": "Navy",
-          "userId": "bb94"
-        }
-      ],
-      "total": 4799,
-      "paymentMethod": "card",
-      "status": "completed",
-      "createdAt": "2026-01-02T04:19:04.026Z"
-    },
-    {
-      "id": "7e27",
-      "userId": "bb94",
-      "items": [
-        {
-          "id": "38fc",
+          "id": "7b7b",
           "productId": "3",
           "productName": "Zoom Freak 4",
           "price": 8925,
           "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
           "quantity": 1,
-          "size": 11,
+          "size": 8,
           "color": "Red",
           "userId": "bb94"
         }
       ],
       "total": 8925,
-      "paymentMethod": "card",
-      "status": "completed",
-      "createdAt": "2026-01-02T08:47:31.581Z"
+      "shipping": 0,
+      "subtotal": 8925,
+      "status": "Processing",
+      "createdAt": "2026-01-05T12:19:00.763Z",
+      "paymentMethod": "Card",
+      "cardName": "kdjfkfdgkjfdngkdfnv"
     }
   ]
 }
