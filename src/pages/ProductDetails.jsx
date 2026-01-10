@@ -95,7 +95,7 @@ const toggleWishlist = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <Button variant="ghost" className="mb-8 pl-0 hover:bg-transparent hover:text-blue-600" onClick={() => navigate(-1)}>
+      <Button variant="ghost" className="mb-8 pl-0 hover:bg-transparent hover:text-blue-600 focus:outline-none border-none" onClick={() => navigate(-1)}>
         <ArrowLeft className="w-5 h-5 mr-2" />
         Back to Products
       </Button>

@@ -44,7 +44,8 @@
       ],
       "description": "Lightweight running shoes with breathable mesh and flexible sole.",
       "ratings": 4.5,
-      "reviewsCount": 128
+      "reviewsCount": 128,
+      "category": "sports"
     },
     {
       "id": "2",
@@ -82,7 +83,8 @@
       ],
       "description": "The timeless classic built for the streets.",
       "ratings": 4.7,
-      "reviewsCount": 210
+      "reviewsCount": 210,
+      "category": "casual"
     },
     {
       "id": "3",
@@ -123,7 +125,8 @@
       ],
       "description": "Unleash your inner freak with responsive cushioning.",
       "ratings": 4.8,
-      "reviewsCount": 85
+      "reviewsCount": 85,
+      "category": "formal"
     },
     {
       "id": "4",
@@ -157,7 +160,8 @@
       ],
       "description": "The iconic side-stripe shoe that started it all.",
       "ratings": 4.6,
-      "reviewsCount": 350
+      "reviewsCount": 350,
+      "category": "sports"
     },
     {
       "id": "5",
@@ -195,7 +199,8 @@
       ],
       "description": "Legendary style, refined for the modern sneakerhead.",
       "ratings": 4.9,
-      "reviewsCount": 890
+      "reviewsCount": 890,
+      "category": "casual"
     },
     {
       "id": "6",
@@ -229,7 +234,8 @@
           "size": 10,
           "stock": 10
         }
-      ]
+      ],
+      "category": "formal"
     },
     {
       "id": "7",
@@ -263,7 +269,8 @@
           "size": 9,
           "stock": 15
         }
-      ]
+      ],
+      "category": "sports"
     },
     {
       "id": "8",
@@ -297,7 +304,8 @@
           "size": 9,
           "stock": 28
         }
-      ]
+      ],
+      "category": "casual"
     },
     {
       "id": "9",
@@ -331,7 +339,8 @@
           "size": 10,
           "stock": 12
         }
-      ]
+      ],
+      "category": "formal"
     },
     {
       "id": "10",
@@ -365,7 +374,8 @@
           "size": 10,
           "stock": 7
         }
-      ]
+      ],
+      "category": "sports"
     },
     {
       "id": "11",
@@ -399,7 +409,8 @@
           "size": 10,
           "stock": 9
         }
-      ]
+      ],
+      "category": "casual"
     },
     {
       "id": "12",
@@ -433,7 +444,8 @@
           "size": 9,
           "stock": 14
         }
-      ]
+      ],
+      "category": "formal"
     },
     {
       "id": "13",
@@ -467,7 +479,8 @@
           "size": 9,
           "stock": 24
         }
-      ]
+      ],
+      "category": "sports"
     },
     {
       "id": "14",
@@ -501,7 +514,8 @@
           "size": 10,
           "stock": 5
         }
-      ]
+      ],
+      "category": "casual"
     },
     {
       "id": "15",
@@ -535,7 +549,8 @@
           "size": 10,
           "stock": 8
         }
-      ]
+      ],
+      "category": "formal"
     },
     {
       "id": "16",
@@ -569,7 +584,8 @@
           "size": 9,
           "stock": 15
         }
-      ]
+      ],
+      "category": "sports"
     },
     {
       "id": "17",
@@ -603,7 +619,8 @@
           "size": 9,
           "stock": 19
         }
-      ]
+      ],
+      "category": "casual"
     }
   ],
   "users": [

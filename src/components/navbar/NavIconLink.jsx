@@ -9,7 +9,7 @@ export const NavIconLink = ({ to, icon: Icon, count, label }) => {
     >
       <Icon className="w-5 h-5" />
       {count !== undefined && count > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] bg-blue-600 text-white text-[10px] font-bold rounded-full px-1">
+        <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] bg-red-600 text-white text-[10px] font-bold rounded-full px-1">
           {count > 99 ? '99+' : count}
         </span>
       )}
