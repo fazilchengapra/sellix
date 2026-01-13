@@ -1,32 +1,6 @@
 {
   "products": [
     {
-      "name": "AirFlex Runner",
-      "brand": "Nike",
-      "category": "men",
-      "price": 4999,
-      "description": "Lightweight running shoes with breathable mesh and flexible sole.",
-      "image": "https://i.pinimg.com/1200x/9b/07/fd/9b07fd15394d1fd5a9d0c476c3f187c8.jpg",
-      "colors": [
-        {
-          "name": "Default",
-          "images": [
-            "https://i.pinimg.com/1200x/9b/07/fd/9b07fd15394d1fd5a9d0c476c3f187c8.jpg"
-          ],
-          "sizes": [
-            38,
-            39,
-            40,
-            41,
-            42,
-            43,
-            44
-          ]
-        }
-      ],
-      "id": "1"
-    },
-    {
       "id": "2",
       "name": "SuperStar Classic",
       "brand": "Adidas",
@@ -622,6 +596,13 @@
       "email": "instacommands.k@gmail.com",
       "password": "123456",
       "role": "user"
+    },
+    {
+      "id": "4bb7",
+      "name": "Fazil",
+      "email": "example@gmail.com",
+      "password": "123456",
+      "role": "admin"
     }
   ],
   "cart": [
@@ -637,15 +618,15 @@
       "userId": "7fe5"
     },
     {
-      "id": "9910",
-      "productId": "2",
-      "productName": "SuperStar Classic",
-      "price": 3599,
-      "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=400&h=400&fit=crop",
+      "id": "d0c5",
+      "productId": "4",
+      "productName": "Old Skool",
+      "price": 3200,
+      "image": "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=400&h=400&fit=crop",
       "quantity": 1,
-      "size": 7,
-      "color": "White",
-      "userId": "0311"
+      "size": 6,
+      "color": "Black/White",
+      "userId": "0360"
     }
   ],
   "wishlist": [
@@ -704,6 +685,54 @@
       "createdAt": "2026-01-13T04:54:58.315Z",
       "paymentMethod": "Card",
       "cardName": "sdjnkjckjnc"
+    },
+    {
+      "id": "cd9d",
+      "userId": "0360",
+      "items": [
+        {
+          "id": "d9fa",
+          "productId": "2",
+          "productName": "SuperStar Classic",
+          "price": 3599,
+          "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=400&h=400&fit=crop",
+          "quantity": 1,
+          "size": 7,
+          "color": "White",
+          "userId": "0360"
+        }
+      ],
+      "total": 3649,
+      "shipping": 50,
+      "subtotal": 3599,
+      "status": "Cancelled",
+      "createdAt": "2026-01-13T16:09:50.139Z",
+      "paymentMethod": "Card",
+      "cardName": "zdfcgv"
+    },
+    {
+      "id": "5530",
+      "userId": "0360",
+      "items": [
+        {
+          "id": "d0c5",
+          "productId": "4",
+          "productName": "Old Skool",
+          "price": 3200,
+          "image": "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=400&h=400&fit=crop",
+          "quantity": 1,
+          "size": 6,
+          "color": "Black/White",
+          "userId": "0360"
+        }
+      ],
+      "total": 3250,
+      "shipping": 50,
+      "subtotal": 3200,
+      "status": "Cancelled",
+      "createdAt": "2026-01-13T16:24:16.773Z",
+      "paymentMethod": "Card",
+      "cardName": "kdcmdcndjn"
     }
   ]
 }

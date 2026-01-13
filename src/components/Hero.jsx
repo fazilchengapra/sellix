@@ -4,7 +4,7 @@ import { Button } from "./ui/Button";
 
 const Hero = () => {
   return (
-    <div className="relative bg-linear-to-br from-blue-100 via-white to-white overflow-hidden">
+    <div className="relative bg-linear-to-br from-blue-50 via-white to-white overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent"></div>
       <div className="max-w-7xl mx-auto">
         <div className="relative z-10 pb-8 sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32 pt-20">
