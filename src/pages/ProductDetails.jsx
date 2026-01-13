@@ -53,9 +53,8 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     try {
-      if (!user) return showToast("Please login, then try again", "warning");
       if (!product || !selectedSize || !selectedColor) return;
-      
+
       addToCart({
         productId: product.id,
         productName: product.name,
@@ -89,6 +88,11 @@ const ProductDetails = () => {
       });
       showToast("Added to wishlist", "success");
     }
+  };
+
+  const handleActions = (action) => {
+    if (!user) return showToast("Please login, then try again", "warning");
+    action()
   };
 
   if (loading) {
@@ -133,7 +137,7 @@ const ProductDetails = () => {
           </div>
 
           {/* Selectors */}
-          <ProductSelectors 
+          <ProductSelectors
             sizes={product.sizes}
             colors={product.colors}
             selectedSize={selectedSize}
@@ -142,9 +146,9 @@ const ProductDetails = () => {
             setSelectedColor={setSelectedColor}
           />
 
-          <ProductActions 
-            onAddToCart={handleAddToCart}
-            onToggleWishlist={toggleWishlist}
+          <ProductActions
+            onAddToCart={() => handleActions(handleAddToCart)}
+            onToggleWishlist={() => handleActions(toggleWishlist)}
             isInWishlist={isInWishlist(product.id)}
           />
         </div>
