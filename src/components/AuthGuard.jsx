@@ -21,7 +21,7 @@ export const PrivateRoute = () => {
 };
 
 export const PublicRoute = () => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -32,7 +32,50 @@ export const PublicRoute = () => {
   }
 
   if (isAuthenticated) {
+    if (user?.role === 'admin') {
+      return <Navigate to="/admin" replace />;
+    }
     return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+};
+
+export const AdminRoute = () => {
+    const { isAuthenticated, user, loading } = useAuth();
+  
+    if (loading) {
+      return (
+        <div className="flex justify-center items-center h-screen">
+          <Spinner size={40} />
+        </div>
+      );
+    }
+  
+    if (!isAuthenticated) {
+      return <Navigate to="/login" replace />;
+    }
+    
+    if (user?.role !== 'admin') {
+        return <Navigate to="/" replace />;
+    }
+  
+    return <Outlet />;
+};
+
+export const ShopRoute = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner size={40} />
+      </div>
+    );
+  }
+
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin" replace />;
   }
 
   return <Outlet />;

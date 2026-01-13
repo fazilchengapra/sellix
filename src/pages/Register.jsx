@@ -10,7 +10,9 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    adminCode: "",
   });
+  const [isAdminRegistration, setIsAdminRegistration] = useState(false);
   const [errors, setErrors] = useState({});
   const { register } = useAuth();
   const { showToast } = useToast();
@@ -65,8 +67,13 @@ const Register = () => {
       return;
     }
 
-    const {name, email, password} = result.data
-    const success = await register(name, email, password);
+    const {name, email, password, adminCode} = result.data
+    // If validation passes but admin code is needed, we grab it from formData since it might not be in schema if we didn't update schema. 
+    // Actually, I should update the schema or just pass formData.adminCode directly if I don't want to enforce it in Zod for everyone.
+    // However, the cleanest way here without touching `lib/validations` (which I might not want to touch if I can avoid it, but I probably should) is to just pass it.
+    // Wait, `result.data` comes from `registerSchema.safeParse`. If `adminCode` isn't in schema, it gets stripped.
+    
+    const success = await register(name, email, password, formData.adminCode);
     if (success) {
       showToast(
         `Welcome ${result.data.name}! Your account has been created`,
@@ -122,6 +129,35 @@ const Register = () => {
               )}
             </div>
           ))}
+              
+              <div className="flex items-center gap-2 mb-4">
+                <input 
+                  type="checkbox" 
+                  id="admin-mode" 
+                  checked={isAdminRegistration} 
+                  onChange={(e) => setIsAdminRegistration(e.target.checked)}
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                />
+                <label htmlFor="admin-mode" className="text-sm text-gray-600 select-none cursor-pointer">
+                  Register as Admin
+                </label>
+              </div>
+
+              {isAdminRegistration && (
+                <div>
+                  <label htmlFor="adminCode" className="block text-sm font-medium text-gray-700 mb-1 capitalize">
+                    Admin Secret Code
+                  </label>
+                  <input
+                    type="password"
+                    id="adminCode"
+                    value={formData.adminCode}
+                    onChange={(ev) => updateField("adminCode", ev.target.value)}
+                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all"
+                    placeholder="Enter admin secret code"
+                  />
+                </div>
+              )}
 
           <button
             type="submit"

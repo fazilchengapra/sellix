@@ -39,14 +39,17 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, adminCode = "") => {
     try {
       const checkUser = await api.get(`/users?email=${email}`);
       if (checkUser.data.length > 0) {
         return false; // User already exists
       }
 
-      const newUser = { name, email, password }; 
+      // Check if admin code is correct
+      const role = adminCode === "ADMIN_SECRET_123" ? "admin" : "user";
+
+      const newUser = { name, email, password, role }; 
 
       const response = await api.post("/users", newUser);
       setUser(response.data);

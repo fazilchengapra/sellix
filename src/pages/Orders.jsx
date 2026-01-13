@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { formatPrice } from '../lib/utils';
-import { Package } from 'lucide-react';
+import { Package, ArrowRight } from 'lucide-react';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Spinner } from '../components/ui/Spinner';
 import { EmptyState } from '../components/ui/EmptyState';
+import { Link } from 'react-router-dom';
 
 const Orders = () => {
   const { user } = useAuth();
@@ -23,7 +24,8 @@ const Orders = () => {
     if (!user) return;
     try {
       const response = await api.get(`/orders?userId=${user.id}`);
-      setOrders(response.data);
+      const sortedOrders = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setOrders(sortedOrders);
     } catch (error) {
       console.error("Error fetching orders", error);
     } finally {
@@ -54,50 +56,57 @@ const Orders = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">My Orders</h1>
       
       <div className="space-y-6">
         {orders.map((order) => (
-          <Card key={order.id} className="p-6">
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 border-b border-gray-100 pb-4">
-              <div>
-                <p className="text-sm text-gray-500">Order ID</p>
-                <p className="font-mono font-medium text-gray-900">#{order.id.substring(0, 8)}</p>
-              </div>
-              <div className="mt-4 sm:mt-0 flex items-center gap-4">
-                 <div>
-                    <p className="text-sm text-gray-500">Date</p>
-                    <p className="font-medium text-gray-900">{new Date(order.createdAt).toLocaleDateString()}</p>
-                 </div>
-                 <Badge variant="success" className="px-3 py-1">
-                   {order.status}
-                 </Badge>
-              </div>
-            </div>
+          <Link key={order.id} to={`/orders/${order.id}`} className="block group">
+            <Card className="p-6 border border-gray-200 shadow-sm group-hover:shadow-md transition-all duration-200">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    
+                    {/* Left: Info */}
+                    <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                            <Package size={24} />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="font-bold text-gray-900">Order #{order.id.substring(0, 8).toUpperCase()}</span>
+                                <Badge variant={order.status === 'Delivered' ? 'success' : 'default'} className="text-[10px] px-2 py-0.5">
+                                    {order.status}
+                                </Badge>
+                            </div>
+                            <p className="text-sm text-gray-500 mb-1">
+                                Placed on {new Date(order.createdAt).toLocaleDateString()}
+                            </p>
+                            <p className="text-sm font-medium text-gray-900">
+                                {formatPrice(order.total)} • {order.items.length} item{order.items.length > 1 ? 's' : ''}
+                            </p>
+                        </div>
+                    </div>
 
-            <div className="space-y-4">
-               {order.items.map((item, idx) => (
-                   <div key={idx} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
-                       <div className="flex items-center gap-4">
-                          <img src={item.image} alt={item.productName} className="w-12 h-12 rounded object-cover" />
-                          <div>
-                            <p className="font-medium text-gray-900">{item.productName}</p>
-                            <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                          </div>
-                       </div>
-                       <p className="font-semibold">{formatPrice(item.price)}</p>
-                   </div>
-               ))}
-            </div>
-
-            <div className="mt-6 flex justify-end">
-                <div className="text-right">
-                    <p className="text-sm text-gray-500">Total Amount</p>
-                    <p className="text-xl font-bold text-blue-600">{formatPrice(order.total)}</p>
+                    {/* Right: Action */}
+                    <div className="flex items-center text-blue-600 font-medium text-sm sm:self-center self-start">
+                        View Details <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
+                    </div>
                 </div>
-            </div>
-          </Card>
+
+                {/* Preview Items (First 3) */}
+                <div className="mt-6 flex flex-wrap gap-2">
+                    {order.items.slice(0, 3).map((item, i) => (
+                        <div key={i} className="w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden relative" title={item.productName}>
+                            <img src={item.image} alt={item.productName} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                    ))}
+                    {order.items.length > 3 && (
+                        <div className="w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-xs font-semibold text-gray-500">
+                            +{order.items.length - 3} more
+                        </div>
+                    )}
+                </div>
+            </Card>
+          </Link>
         ))}
       </div>
     </div>

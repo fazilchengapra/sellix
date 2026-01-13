@@ -1,51 +1,30 @@
 {
   "products": [
     {
-      "id": "1",
       "name": "AirFlex Runner",
       "brand": "Nike",
+      "category": "men",
       "price": 4999,
-      "discount": 20,
-      "finalPrice": 3999,
-      "sizes": [
-        {
-          "size": 6,
-          "stock": 5
-        },
-        {
-          "size": 7,
-          "stock": 10
-        },
-        {
-          "size": 8,
-          "stock": 8
-        },
-        {
-          "size": 9,
-          "stock": 3
-        }
-      ],
+      "description": "Lightweight running shoes with breathable mesh and flexible sole.",
+      "image": "https://i.pinimg.com/1200x/9b/07/fd/9b07fd15394d1fd5a9d0c476c3f187c8.jpg",
       "colors": [
         {
-          "colorName": "Black",
-          "hex": "#000000",
+          "name": "Default",
           "images": [
-            "https://i.pinimg.com/1200x/9b/07/fd/9b07fd15394d1fd5a9d0c476c3f187c8.jpg",
-            "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&h=400&fit=crop"
-          ]
-        },
-        {
-          "colorName": "White",
-          "hex": "#FFFFFF",
-          "images": [
-            "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=400&h=400&fit=crop"
+            "https://i.pinimg.com/1200x/9b/07/fd/9b07fd15394d1fd5a9d0c476c3f187c8.jpg"
+          ],
+          "sizes": [
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44
           ]
         }
       ],
-      "description": "Lightweight running shoes with breathable mesh and flexible sole.",
-      "ratings": 4.5,
-      "reviewsCount": 128,
-      "category": "sports"
+      "id": "1"
     },
     {
       "id": "2",
@@ -629,6 +608,20 @@
       "name": "MUHAMMED FAZIL C",
       "email": "muhammedfazilchengapra@gmail.com",
       "password": "123456"
+    },
+    {
+      "id": "b733",
+      "name": "MUHAMMED FAZIL C",
+      "email": "muhammedfazilchengapraa@gmail.com",
+      "password": "123456",
+      "role": "admin"
+    },
+    {
+      "id": "0311",
+      "name": "Fazil",
+      "email": "instacommands.k@gmail.com",
+      "password": "123456",
+      "role": "user"
     }
   ],
   "cart": [
@@ -642,6 +635,17 @@
       "size": 8,
       "color": "Red",
       "userId": "7fe5"
+    },
+    {
+      "id": "9910",
+      "productId": "2",
+      "productName": "SuperStar Classic",
+      "price": 3599,
+      "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=400&h=400&fit=crop",
+      "quantity": 1,
+      "size": 7,
+      "color": "White",
+      "userId": "0311"
     }
   ],
   "wishlist": [
@@ -656,28 +660,50 @@
   ],
   "orders": [
     {
-      "id": "7c7c",
-      "userId": "bb94",
+      "id": "c6e7",
+      "userId": "0360",
       "items": [
         {
-          "id": "7b7b",
-          "productId": "3",
-          "productName": "Zoom Freak 4",
-          "price": 8925,
-          "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
+          "id": "02e1",
+          "productId": "1",
+          "productName": "AirFlex Runner",
+          "price": 4999,
+          "image": "https://i.pinimg.com/1200x/9b/07/fd/9b07fd15394d1fd5a9d0c476c3f187c8.jpg",
           "quantity": 1,
-          "size": 8,
-          "color": "Red",
-          "userId": "bb94"
+          "userId": "0360"
         }
       ],
-      "total": 8925,
-      "shipping": 0,
-      "subtotal": 8925,
-      "status": "Processing",
-      "createdAt": "2026-01-05T12:19:00.763Z",
+      "total": 5049,
+      "shipping": 50,
+      "subtotal": 4999,
+      "status": "Cancelled",
+      "createdAt": "2026-01-13T04:27:09.385Z",
       "paymentMethod": "Card",
-      "cardName": "kdjfkfdgkjfdngkdfnv"
+      "cardName": "dsjkfndjvndfn"
+    },
+    {
+      "id": "70bb",
+      "userId": "0311",
+      "items": [
+        {
+          "id": "e02e",
+          "productId": "7",
+          "productName": "Court Vision",
+          "price": 4674,
+          "image": "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&h=400&fit=crop",
+          "quantity": 1,
+          "size": 7,
+          "color": "White",
+          "userId": "0311"
+        }
+      ],
+      "total": 4724,
+      "shipping": 50,
+      "subtotal": 4674,
+      "status": "Processing",
+      "createdAt": "2026-01-13T04:54:58.315Z",
+      "paymentMethod": "Card",
+      "cardName": "sdjnkjckjnc"
     }
   ]
 }
