@@ -17,6 +17,41 @@ export const getDashboardStats = async () => {
         const totalProducts = products.length;
         const totalUsers = users.length;
 
+        // Calculate Percentage Changes (Last 30 Days vs Previous 30 Days)
+        const calculateChange = (data, valueFn = () => 1) => {
+            const today = new Date();
+            const last30Days = new Date(today);
+            last30Days.setDate(today.getDate() - 30);
+            
+            const prev30Days = new Date(last30Days);
+            prev30Days.setDate(last30Days.getDate() - 30);
+
+            const currentTotal = data
+                .filter(item => {
+                    const d = new Date(item.createdAt || Date.now()); // Fallback if no date
+                    return d >= last30Days && d <= today;
+                })
+                .reduce((sum, item) => sum + valueFn(item), 0);
+
+            const prevTotal = data
+                .filter(item => {
+                    const d = new Date(item.createdAt || Date.now());
+                    return d >= prev30Days && d < last30Days;
+                })
+                .reduce((sum, item) => sum + valueFn(item), 0);
+            
+            if (prevTotal === 0) return currentTotal > 0 ? 100 : 0;
+            return ((currentTotal - prevTotal) / prevTotal) * 100;
+        };
+
+        const revenueChange = calculateChange(orders, (o) => Number(o.total) || 0);
+        const ordersChange = calculateChange(orders);
+        
+        // Assuming products/users have createdAt. If not, changes will be 0 or inaccurate but safe.
+        // For Products, stock changes are hard to track without history, so we might just track "New Products Added".
+        const productsChange = calculateChange(products); 
+        const usersChange = calculateChange(users);
+
         // Calculate recent activity (last 5 orders)
         const sortedOrders = orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         const recentActivity = sortedOrders.slice(0, 5);
@@ -66,6 +101,10 @@ export const getDashboardStats = async () => {
             orders: totalOrders,
             products: totalProducts,
             users: totalUsers,
+            revenueChange,
+            ordersChange,
+            productsChange,
+            usersChange,
             recentActivity,
             chartData,
             topUsers
