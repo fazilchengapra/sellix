@@ -113,6 +113,25 @@ const ProductDetails = () => {
 
   const currentImage = getCurrentImage();
 
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: product.name,
+          text: product.description,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        showToast("Link copied to clipboard", "success");
+      }
+    } catch (error) {
+       if (error.name !== "AbortError") {
+        console.error("Error sharing:", error);
+      }
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <Button
@@ -149,6 +168,7 @@ const ProductDetails = () => {
           <ProductActions
             onAddToCart={() => handleActions(handleAddToCart)}
             onToggleWishlist={() => handleActions(toggleWishlist)}
+            onShare={handleShare}
             isInWishlist={isInWishlist(product.id)}
           />
         </div>

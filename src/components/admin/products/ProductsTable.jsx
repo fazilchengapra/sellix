@@ -7,17 +7,17 @@ const ProductsTable = ({ products, onEdit, onDelete }) => {
         <thead>
           <tr className="bg-gray-50 border-b border-gray-200">
             <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
-            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
-            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Price</th>
-            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stock</th>
-            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Category</th>
+            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Price</th>
+            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap">Stock</th>
+            <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right whitespace-nowrap">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200">
           {products.map((product) => (
             <tr key={product.id} className="hover:bg-gray-50 transition-colors">
               <td className="px-6 py-4">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 min-w-[200px]">
                   <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
                      {product.colors?.[0]?.images?.[0] && (
                        <img src={product.colors[0].images[0]} alt={product.name} className="w-full h-full object-cover" />
@@ -29,9 +29,9 @@ const ProductsTable = ({ products, onEdit, onDelete }) => {
                   </div>
                 </div>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-500 capitalize">{product.category}</td>
-              <td className="px-6 py-4 text-sm font-medium text-gray-900">₹{product.price}</td>
-              <td className="px-6 py-4">
+              <td className="px-6 py-4 text-sm text-gray-500 capitalize whitespace-nowrap">{product.category}</td>
+              <td className="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">₹{product.price}</td>
+              <td className="px-6 py-4 whitespace-nowrap">
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                   In Stock
                 </span>

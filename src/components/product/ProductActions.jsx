@@ -1,7 +1,7 @@
 import { ShoppingCart, Heart, Share2 } from "lucide-react";
 import { Button } from "../ui/Button";
 
-const ProductActions = ({ onAddToCart, onToggleWishlist, isInWishlist }) => {
+const ProductActions = ({ onAddToCart, onToggleWishlist, onShare, isInWishlist }) => {
   return (
     <div className="mt-10 flex gap-4">
       <Button
@@ -24,7 +24,7 @@ const ProductActions = ({ onAddToCart, onToggleWishlist, isInWishlist }) => {
           }`}
         />
       </Button>
-      <Button variant="ghost" size="lg" className="h-14 px-6">
+      <Button variant="ghost" size="lg" className="h-14 px-6" onClick={onShare}>
         <Share2 className="w-6 h-6" />
       </Button>
     </div>

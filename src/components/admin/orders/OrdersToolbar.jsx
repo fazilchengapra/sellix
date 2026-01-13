@@ -8,25 +8,15 @@ const OrdersToolbar = ({
     statusOptions 
 }) => {
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-      <div className="flex-1 w-full sm:w-auto">
-         {/* Search Box - kept separate or combined depending on design. In original it was split. */}
-         {/* Original design had Filter on top right and search in a separate block below header. 
-             I will adapt to keep original layout but componentized.
-             Actually the original had header + filter on one row, then search in a box below.
-             Let's specific "OrdersToolbar" for the Filter part and "OrdersSearch" for the search part maybe? 
-             Or just keep them flexible. 
-         */}
-      </div>
-      
+    <div className="flex flex-col sm:flex-row justify-end items-start sm:items-center gap-4 w-full sm:w-auto">
        {/* Filter Dropdown */}
-       <div className="flex flex-wrap items-center gap-3">
-             <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 flex items-center gap-2 shadow-sm">
+       <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+             <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 flex items-center gap-2 shadow-sm w-full sm:w-auto">
                  <Filter size={16} className="text-gray-400" />
                  <select 
                     value={statusFilter} 
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="bg-transparent border-none text-sm font-medium text-gray-700 outline-none cursor-pointer"
+                    className="bg-transparent border-none text-sm font-medium text-gray-700 outline-none cursor-pointer w-full"
                 >
                      {statusOptions.map(opt => (
                          <option key={opt} value={opt}>{opt === 'All' ? 'All Status' : opt}</option>

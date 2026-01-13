@@ -31,7 +31,7 @@ const AdminLayout = () => {
       />
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 min-h-screen bg-gray-50 flex flex-col transition-all duration-300">
+      <main className="flex-1 md:ml-64 min-w-0 min-h-screen bg-gray-50 flex flex-col transition-all duration-300">
         <AdminHeader setSidebarOpen={setSidebarOpen} />
         <div className="p-4 sm:p-8">
           <Outlet />
