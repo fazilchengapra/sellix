@@ -37,6 +37,7 @@ const AdminOrders = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+  
 
   useEffect(() => {
       let result = orders;
@@ -104,7 +105,8 @@ const AdminOrders = () => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-        const response = await api.patch(`/orders/${orderId}`, { status: newStatus });
+        
+        const response = await api.patch(`/orders/${orderId}`, {status: newStatus });
         const updatedOrder = response.data;
         setOrders(orders.map(order => order.id === orderId ? updatedOrder : order));
         if (selectedOrder && selectedOrder.id === orderId) {

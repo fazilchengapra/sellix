@@ -52,7 +52,7 @@ const OrderDetails = () => {
     if (pendingStatus === order.status) return;
     setSaving(true);
     try {
-      await api.patch(`/orders/${order.id}`, { status: pendingStatus });
+      await api.put(`/orders/${order.id}`, {...order, status: pendingStatus });
       setOrder({ ...order, status: pendingStatus });
       showToast("Order status updated", "success");
     } catch (err) {

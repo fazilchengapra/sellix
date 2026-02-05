@@ -14,7 +14,7 @@ const StatCard = ({ title, value, icon: Icon, change, iconColor = "blue", subtex
         <div className={`p-3 rounded-xl ${colorClasses[iconColor]}`}>
           <Icon size={22} strokeWidth={2} />
         </div>
-        {change !== undefined && (
+        {change && (
              <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full ${
                  change >= 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
              }`}>

@@ -48,6 +48,7 @@ const Login = () => {
 
     const success = await login(result.data.email, result.data.password);
     if (success) {
+      if(success.blocked) return showToast('The user has been blocked!', 'error')
       showToast("Login successful! Welcome back", "success");
       navigate("/");
     } else {

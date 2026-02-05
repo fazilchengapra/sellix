@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useState,
-  useContext,
-  useEffect,
-} from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import api from "../api/axios";
 
 const AuthContext = createContext(undefined);
@@ -26,8 +21,9 @@ export const AuthProvider = ({ children }) => {
       const response = await api.get(`/users?email=${email}`);
       if (response.data.length > 0) {
         const loggedInUser = response.data[0];
-      if(!loggedInUser.password || loggedInUser.password !== pass) return false
-        
+        if (!loggedInUser.password || loggedInUser.password !== pass)
+          return false;
+        if (loggedInUser.isBlocked) return { blocked: true };
         setUser(loggedInUser);
         localStorage.setItem("user", JSON.stringify(loggedInUser));
         return true;
@@ -49,7 +45,7 @@ export const AuthProvider = ({ children }) => {
       // Check if admin code is correct
       const role = adminCode === "ADMIN_SECRET_123" ? "admin" : "user";
 
-      const newUser = { name, email, password, role }; 
+      const newUser = { name, email, password, role };
 
       const response = await api.post("/users", newUser);
       setUser(response.data);
@@ -68,7 +64,14 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, register, logout, isAuthenticated: !!user, loading }}
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        isAuthenticated: !!user,
+        loading,
+      }}
     >
       {children}
     </AuthContext.Provider>

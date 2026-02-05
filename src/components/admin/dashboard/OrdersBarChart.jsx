@@ -4,7 +4,7 @@ const OrdersBarChart = ({ data }) => {
   return (
     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <h3 className="text-lg font-bold text-gray-900 mb-6">Orders Overview</h3>
-        <div className="h-[300px] w-full">
+        <div className="h-75 w-full">
             <ResponsiveContainer width="100%" height="100%">
                  <BarChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />

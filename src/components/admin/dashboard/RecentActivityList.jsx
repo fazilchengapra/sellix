@@ -1,6 +1,8 @@
 import { Package, ArrowUpRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const RecentActivityList = ({ activities }) => {
+  const navigate = useNavigate('')
   return (
     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
       <div className="flex justify-between items-center mb-6">

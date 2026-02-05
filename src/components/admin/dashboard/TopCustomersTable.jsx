@@ -1,11 +1,13 @@
 import { ArrowUpRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const TopCustomersTable = ({ users }) => {
+    const navigate = useNavigate()
   return (
     <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div className="flex justify-between items-center mb-6">
              <h3 className="text-lg font-bold text-gray-900">Top Customers</h3>
-             <button className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center gap-1">
+             <button onClick={() => navigate('orders')} className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center gap-1">
                  View All <ArrowUpRight size={16} />
              </button>
         </div>
