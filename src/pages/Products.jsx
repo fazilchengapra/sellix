@@ -12,43 +12,52 @@ const Products = () => {
   const [selectedBrand, setSelectedBrand] = useState('All');
   const [priceSort, setPriceSort] = useState('default');
 
+  const [categories, setCategories] = useState(['All']);
+  const [brands, setBrands] = useState(['All']);
+
+  // Fetch initial data to populate filter options
   useEffect(() => {
-    fetchProducts();
+    const fetchInitialOptions = async () => {
+      try {
+        const response = await api.get('/products/');
+        const allProds = response.data;
+        setCategories(['All', ...new Set(allProds.map(p => p.category).filter(Boolean))]);
+        setBrands(['All', ...new Set(allProds.map(p => p.brand).filter(Boolean))]);
+      } catch (error) {
+        console.error("Error fetching initial products for filters", error);
+      }
+    };
+    fetchInitialOptions();
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      const response = await api.get('/products');
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Error fetching products", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Fetch products based on filters
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const params = {};
+        if (searchQuery) params.search = searchQuery;
+        if (selectedCategory !== 'All') params.category = selectedCategory;
+        if (selectedBrand !== 'All') params.brand = selectedBrand;
+        if (priceSort !== 'default') params.sort = priceSort;
 
-  const categories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
-  const brands = ['All', ...new Set(products.map(p => p.brand).filter(Boolean))];
+        const response = await api.get('/products/', { params });
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching products", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filteredProducts = products
-    .filter(product => {
-      const matchesSearch = 
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category?.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-      const matchesBrand = selectedBrand === 'All' || product.brand === selectedBrand;
+    const delayDebounceFn = setTimeout(() => {
+      fetchProducts();
+    }, 300);
 
-      return matchesSearch && matchesCategory && matchesBrand;
-    })
-    .sort((a, b) => {
-      if (priceSort === 'low-to-high') return a.price - b.price;
-      if (priceSort === 'high-to-low') return b.price - a.price;
-      return 0;
-    });
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, selectedCategory, selectedBrand, priceSort]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Spinner size={40} /></div>;
+  if (loading && products.length === 0) return <div className="min-h-screen flex items-center justify-center"><Spinner size={40} /></div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -106,12 +115,12 @@ const Products = () => {
       </div>
       
       <div className="mb-4 text-sm text-gray-500 font-medium">
-        {filteredProducts.length} Items Found
+        {products.length} Items Found
       </div>
 
-      {filteredProducts.length > 0 ? (
+      {products.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-          {filteredProducts.map((product) => (
+          {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

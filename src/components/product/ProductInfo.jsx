@@ -19,7 +19,7 @@ const ProductInfo = ({ product }) => {
             </span>
           </div>
           <span className="text-gray-500 text-sm">
-            ({product.reviewsCount} reviews)
+            ({product.reviews_count || product.reviewsCount || 0} reviews)
           </span>
         </div>
       </div>

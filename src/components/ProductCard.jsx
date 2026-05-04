@@ -12,7 +12,7 @@ export const ProductCard = ({ product }) => {
   const { showToast } = useToast();
   const {user} = useAuth()
 
-  const image = product.colors?.[0]?.images?.[0] || '';
+  const image = product.colors?.[0]?.images?.[0]?.image || '';
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -25,7 +25,7 @@ export const ProductCard = ({ product }) => {
         image: image, 
         quantity: 1,
         size: product.sizes?.[0]?.size,
-        color: product.colors?.[0]?.colorName
+        color: product.colors?.[0]?.color_name
     });
     showToast("Added to cart", "success");
   };
@@ -73,7 +73,7 @@ export const ProductCard = ({ product }) => {
           <div className="flex items-center text-yellow-500 text-xs">
             <Star className="w-3.5 h-3.5 fill-current" />
             <span className="ml-1 text-gray-600 font-medium">{product.ratings}</span>
-            <span className="ml-1 text-gray-400">({product.reviewsCount})</span>
+            <span className="ml-1 text-gray-400">({product.reviews_count || product.reviewsCount || 0})</span>
           </div>
         </div>
       </div>

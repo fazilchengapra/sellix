@@ -39,15 +39,15 @@ const ProductSelectors = ({
           <div className="flex flex-wrap gap-3">
             {colors.map((color) => (
               <button
-                key={color.colorName}
-                onClick={() => setSelectedColor(color.colorName)}
+                key={color.color_name || color.colorName}
+                onClick={() => setSelectedColor(color.color_name || color.colorName)}
                 className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
-                  selectedColor === color.colorName
+                  selectedColor === (color.color_name || color.colorName)
                     ? "ring-2 ring-blue-600 ring-offset-2"
                     : "border-gray-200 hover:border-gray-300"
                 }`}
                 style={{ backgroundColor: color.hex }}
-                title={color.colorName}
+                title={color.color_name || color.colorName}
               />
             ))}
           </div>

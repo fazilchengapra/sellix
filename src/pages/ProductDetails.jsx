@@ -37,7 +37,7 @@ const ProductDetails = () => {
       const data = response.data;
       setProduct(data);
       if (data.sizes?.length > 0) setSelectedSize(data.sizes[0].size);
-      if (data.colors?.length > 0) setSelectedColor(data.colors[0].colorName);
+      if (data.colors?.length > 0) setSelectedColor(data.colors[0].color_name || data.colors[0].colorName);
     } catch (error) {
       console.error("Error fetching product", error);
     } finally {
@@ -47,8 +47,8 @@ const ProductDetails = () => {
 
   const getCurrentImage = () => {
     if (!product) return "";
-    const colorObj = product.colors.find((c) => c.colorName === selectedColor);
-    return colorObj?.images[0] || product.colors[0]?.images[0] || "";
+    const colorObj = product.colors.find((c) => (c.color_name || c.colorName) === selectedColor);
+    return colorObj?.images?.[0]?.image || colorObj?.images?.[0] || product.colors[0]?.images?.[0]?.image || product.colors[0]?.images?.[0] || "";
   };
 
   const handleAddToCart = () => {
