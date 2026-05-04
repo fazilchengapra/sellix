@@ -18,48 +18,64 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, pass) => {
     try {
-      const response = await api.get(`/users?email=${email}`);
-      if (response.data.length > 0) {
-        const loggedInUser = response.data[0];
-        if (!loggedInUser.password || loggedInUser.password !== pass)
-          return false;
-        if (loggedInUser.isBlocked) return { blocked: true };
-        setUser(loggedInUser);
-        localStorage.setItem("user", JSON.stringify(loggedInUser));
-        return true;
-      }
-      return false;
+      const response = await api.post("auth/login/", {
+        email: email,
+        password: pass,
+      });
+
+      const { access, refresh } = response.data;
+
+      // ✅ store tokens
+      localStorage.setItem("access", access);
+      localStorage.setItem("refresh", refresh);
+
+      // Fetch user profile using the access token
+      const userResponse = await api.get("user/me/", {
+        headers: {
+          Authorization: `Bearer ${access}`
+        }
+      });
+
+      setUser(userResponse.data);
+      localStorage.setItem("user", JSON.stringify(userResponse.data));
+
+      return true;
     } catch (error) {
-      console.error("Login error", error);
+      console.error("Login error", error.response?.data || error.message);
       return false;
     }
   };
 
   const register = async (name, email, password, adminCode = "") => {
     try {
-      const checkUser = await api.get(`/users?email=${email}`);
-      if (checkUser.data.length > 0) {
-        return false; // User already exists
-      }
-
-      // Check if admin code is correct
-      const role = adminCode === "ADMIN_SECRET_123" ? "admin" : "user";
-
+      const role = adminCode === "ADMIN_SECRET_123" ? "admin" : "customer";
       const newUser = { name, email, password, role };
 
-      const response = await api.post("/users", newUser);
-      setUser(response.data);
-      localStorage.setItem("user", JSON.stringify(response.data));
-      return true;
+      // Call the real backend register API
+      await api.post("auth/register/", newUser);
+
+      // Auto-login after successful registration
+      return await login(email, password);
     } catch (error) {
-      console.error("Registration error", error);
+      console.error("Registration error", error.response?.data || error.message);
       return false;
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
+  const logout = async () => {
+    try {
+      const refresh = localStorage.getItem("refresh");
+      if (refresh) {
+        await api.post("auth/logout/", { refresh });
+      }
+    } catch (error) {
+      console.error("Logout error", error.response?.data || error.message);
+    } finally {
+      setUser(null);
+      localStorage.removeItem("user");
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+    }
   };
 
   return (
