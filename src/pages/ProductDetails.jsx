@@ -51,11 +51,11 @@ const ProductDetails = () => {
     return colorObj?.images?.[0]?.image || colorObj?.images?.[0] || product.colors[0]?.images?.[0]?.image || product.colors[0]?.images?.[0] || "";
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     try {
       if (!product || !selectedSize || !selectedColor) return;
 
-      addToCart({
+      await addToCart({
         productId: product.id,
         productName: product.name,
         price: product.finalPrice || product.price,
@@ -67,6 +67,7 @@ const ProductDetails = () => {
       showToast("Added to cart", "success");
     } catch (error) {
       console.log(error);
+      showToast(error.response?.data?.error || "Failed to add to cart", "error");
     }
   };
 
@@ -74,7 +75,7 @@ const ProductDetails = () => {
     if (!product) return;
 
     // Check if item is already in wishlist to get its ID
-    const wishlistItem = wishlist.find((item) => item.productId === product.id);
+    const wishlistItem = Array.isArray(wishlist) ? wishlist.find((item) => item.product?.id === product.id) : null;
 
     if (wishlistItem) {
       removeFromWishlist(wishlistItem.id);

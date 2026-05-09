@@ -11,8 +11,18 @@ export const CartProvider = ({ children }) => {
   const fetchCart = async () => {
     if (!user) return;
     try {
-      const response = await api.get(`/cart?userId=${user.id}`);
-      setCart(response.data);
+      const response = await api.get(`/cart/`);
+      const formattedItems = (response.data.items || []).map(item => ({
+          id: item.id,
+          productId: item.product, 
+          productName: item.product_name,
+          price: parseFloat(item.price),
+          image: item.image,
+          size: item.size,
+          color: item.color,
+          quantity: item.quantity
+      }));
+      setCart(formattedItems);
     } catch (error) {
       console.error("Error fetching cart", error);
     }
@@ -26,26 +36,20 @@ export const CartProvider = ({ children }) => {
     }
   }, [user]);
 
-
   const addToCart = async (item) => {
-    if (!user) {
-        // Ideally show toast here or redirect
-        return;
-    }
+    if (!user) return;
     
-    // Check if item exists (productId + size + color)
-    const existingItem = cart.find(
-        c => c.productId === item.productId && c.size === item.size && c.color === item.color
-    );
-
-    if (existingItem) {
-        const updatedItem = { ...existingItem, quantity: existingItem.quantity + item.quantity };
-        await api.put(`/cart/${existingItem.id}`, updatedItem);
-        setCart(prev => prev.map(c => c.id === existingItem.id ? updatedItem : c));
-    } else {
-        const newItem = { ...item, userId: user.id };
-        const response = await api.post('/cart', newItem);
-        setCart(prev => [...prev, response.data]);
+    try {
+        await api.post('/cart/', {
+            product_id: item.productId,
+            size: item.size,
+            color: item.color,
+            quantity: item.quantity
+        });
+        await fetchCart();
+    } catch (error) {
+        console.error("Error adding to cart", error);
+        throw error;
     }
   };
 
@@ -55,29 +59,44 @@ export const CartProvider = ({ children }) => {
     const item = cart.find(i => i.id === id);
     if (!item) return;
 
+    const previousCart = [...cart];
+    setCart(prev => prev.map(i => i.id === id ? { ...i, quantity } : i));
+
     try {
-        const updatedItem = { ...item, quantity };
-        await api.put(`/cart/${id}`, updatedItem);
-        setCart(prev => prev.map(i => i.id === id ? updatedItem : i));
+        console.log("PATCH sending", id, quantity);
+
+        await api.patch(`/cart/${Number(id)}/`, { quantity });
     } catch (error) {
         console.error("Error updating quantity", error);
+        setCart(previousCart);
+        throw error;
     }
   };
 
   const removeFromCart = async (id) => {
+    const previousCart = [...cart];
+    setCart(prev => prev.filter(item => item.id !== id));
+
     try {
-      await api.delete(`/cart/${id}`);
-      setCart(prev => prev.filter(item => item.id !== id));
+      await api.delete(`/cart/${id}/`);
     } catch (error) {
       console.error("Error removing from cart", error);
+      setCart(previousCart);
+      throw error;
     }
   };
 
   const clearCart = async () => {
     if (!user) return;
-    const deletePromises = cart.map(item => api.delete(`/cart/${item.id}`));
-    await Promise.all(deletePromises);
+    const previousCart = [...cart];
     setCart([]);
+    try {
+        const deletePromises = previousCart.map(item => api.delete(`/cart/${item.id}/`));
+        await Promise.all(deletePromises);
+    } catch (error) {
+        console.error("Error clearing cart", error);
+        setCart(previousCart);
+    }
   };
 
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);

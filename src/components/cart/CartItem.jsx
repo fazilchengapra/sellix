@@ -1,11 +1,29 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { formatPrice } from '../../lib/utils';
 import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 
 export const CartItem = ({ item }) => {
   const { updateQuantity, removeFromCart } = useCart();
+  const { showToast } = useToast();
+
+  const handleUpdateQuantity = async (newQuantity) => {
+      try {
+          await updateQuantity(item.id, newQuantity);
+      } catch (error) {
+          showToast(error.response?.data?.error || "Failed to update quantity", "error");
+      }
+  };
+
+  const handleRemove = async () => {
+      try {
+          await removeFromCart(item.id);
+      } catch (error) {
+          showToast(error.response?.data?.error || "Failed to remove item", "error");
+      }
+  };
 
   return (
     <Card className="flex flex-col sm:flex-row p-4 gap-4 transition-all hover:shadow-md">
@@ -46,7 +64,7 @@ export const CartItem = ({ item }) => {
                 variant="outline" 
                 size="icon" 
                 className="w-8 h-8 rounded-full p-0"
-                onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                onClick={() => handleUpdateQuantity(Math.max(1, item.quantity - 1))}
             >
                 <Minus className="w-4 h-4" />
             </Button>
@@ -55,7 +73,7 @@ export const CartItem = ({ item }) => {
                 variant="outline" 
                 size="icon" 
                 className="w-8 h-8 rounded-full p-0"
-                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                onClick={() => handleUpdateQuantity(item.quantity + 1)}
             >
                 <Plus className="w-4 h-4" />
             </Button>
@@ -66,7 +84,7 @@ export const CartItem = ({ item }) => {
             variant="ghost" 
             size="sm" 
             className="text-red-500 hover:text-red-700 hover:bg-red-50"
-            onClick={() => removeFromCart(item.id)}
+            onClick={handleRemove}
           >
             <Trash2 className="w-4 h-4 mr-2" />
             Remove

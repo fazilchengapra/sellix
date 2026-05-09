@@ -1,62 +1,70 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api/',
+  baseURL: "http://localhost:8000/api/",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
-// Request interceptor to attach access token
+// ✅ Attach access token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access');
+    const token = localStorage.getItem("access");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
-// Response interceptor to handle token refresh on 401 Unauthorized
+// ✅ Handle refresh + retry (FIXED)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    if (originalRequest.url.includes("auth/login")) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem('refresh');
-        if (!refreshToken) {
-          return Promise.reject(error);
-        }
+        const refresh = localStorage.getItem("refresh");
 
-        // Use global axios to avoid interceptor loops
-        const response = await axios.post('http://127.0.0.1:8000/api/auth/refresh/token/', {
-          refresh: refreshToken,
+        if (!refresh) throw error;
+
+        const res = await axios.post(
+          "http://localhost:8000/api/auth/refresh/token/",
+          { refresh },
+        );
+
+        const newAccess = res.data.access;
+        localStorage.setItem("access", newAccess);
+
+        // 🔥 IMPORTANT FIX: preserve full request
+        return api({
+          ...originalRequest,
+          headers: {
+            ...originalRequest.headers,
+            Authorization: `Bearer ${newAccess}`,
+            "Content-Type": "application/json",
+          },
         });
-
-        const newAccessToken = response.data.access;
-        localStorage.setItem('access', newAccessToken);
-
-        // Update the header of the original request and retry it
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        // Refresh token expired or invalid, log out the user
-        localStorage.removeItem('access');
-        localStorage.removeItem('refresh');
-        localStorage.removeItem('user');
-        window.location.href = '/login'; // Redirect to login
-        return Promise.reject(refreshError);
+      } catch (err) {
+        localStorage.clear();
+        window.location.href = "/login";
+        return Promise.reject(err);
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

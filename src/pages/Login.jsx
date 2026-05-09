@@ -7,6 +7,7 @@ import { loginSchema } from "../lib/validations";
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -29,7 +30,9 @@ const Login = () => {
   ];
 
   const handleSubmit = async (e) => {
+    if (isSubmitting) return;
     e.preventDefault();
+    setIsSubmitting(true);
     setErrors({});
 
     // Validate with Zod
@@ -46,14 +49,22 @@ const Login = () => {
       return;
     }
 
-    const success = await login(result.data.email, result.data.password);
-    if (success) {
-      if(success.blocked) return showToast('The user has been blocked!', 'error')
-      showToast("Login successful! Welcome back", "success");
-      navigate("/");
-    } else {
-      setErrors({ email: "Invalid credentials or user not found" });
-      showToast("Invalid credentials or user not found", "error");
+    try {
+      const success = await login(result.data.email, result.data.password);
+      if (success) {
+        if (success.blocked)
+          return showToast("The user has been blocked!", "error");
+        showToast("Login successful! Welcome back", "success");
+        navigate("/");
+      } else {
+        setErrors({ email: "Invalid credentials or user not found" });
+        showToast("Invalid credentials or user not found", "error");
+      }
+    } catch (err) {
+      setErrors({ email: "An error occurred during login" });
+      showToast("An error occurred during login", "error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -96,8 +107,9 @@ const Login = () => {
           ))}
 
           <button
+            disabled={isSubmitting}
             type="submit"
-            className="w-full py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
+            className={`w-full py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             Sign In
           </button>

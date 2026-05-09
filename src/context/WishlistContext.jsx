@@ -19,8 +19,9 @@ export const WishlistProvider = ({ children }) => {
   const fetchWishlist = async () => {
      if (!user) return;
     try {
-      const response = await api.get(`/wishlist?userId=${user.id}`);
-      setWishlist(response.data);
+      const response = await api.get(`/wishlist/`);
+      const data = response.data?.items || [];
+      setWishlist(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching wishlist", error);
     }
@@ -29,13 +30,14 @@ export const WishlistProvider = ({ children }) => {
   const addToWishlist = async (item) => {
     if (!user) return;
     
-    if (isInWishlist(item.productId)) {
+    const productId = item.productId || item;
+    
+    if (isInWishlist(productId)) {
         return; 
     }
 
     try {
-      const newItem = { ...item, userId: user.id };
-      const response = await api.post('/wishlist', newItem);
+      const response = await api.post('/wishlist/', { product_id: productId });
       setWishlist(prev => [...prev, response.data]);
     } catch (error) {
       console.error("Error adding to wishlist", error);
@@ -44,7 +46,7 @@ export const WishlistProvider = ({ children }) => {
 
   const removeFromWishlist = async (id) => {
     try {
-      await api.delete(`/wishlist/${id}`);
+      await api.delete(`/wishlist/${id}/`);
       setWishlist(prev => prev.filter(item => item.id !== id));
     } catch (error) {
       console.error("Error removing from wishlist", error);
@@ -52,7 +54,8 @@ export const WishlistProvider = ({ children }) => {
   };
 
   const isInWishlist = (productId) => {
-      return wishlist.some(item => item.productId === productId);
+      if (!Array.isArray(wishlist)) return false;
+      return wishlist.some(item => item.product?.id === productId);
   }
 
   return (

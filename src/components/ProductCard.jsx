@@ -14,20 +14,25 @@ export const ProductCard = ({ product }) => {
 
   const image = product.colors?.[0]?.images?.[0]?.image || '';
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if(!user) return showToast('Please Login and try again', 'warning')
-    addToCart({ 
-        productId: product.id, 
-        productName: product.name, 
-        price: product.price, 
-        image: image, 
-        quantity: 1,
-        size: product.sizes?.[0]?.size,
-        color: product.colors?.[0]?.color_name
-    });
-    showToast("Added to cart", "success");
+    if(!user) return showToast('Please Login and try again', 'warning');
+    
+    try {
+        await addToCart({ 
+            productId: product.id, 
+            productName: product.name, 
+            price: product.finalPrice || product.price, 
+            image: image, 
+            quantity: 1,
+            size: product.sizes?.[0]?.size,
+            color: product.colors?.[0]?.color_name || product.colors?.[0]?.colorName
+        });
+        showToast("Added to cart", "success");
+    } catch (error) {
+        showToast(error.response?.data?.error || "Failed to add to cart", "error");
+    }
   };
 
   return (
