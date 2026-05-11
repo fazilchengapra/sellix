@@ -99,10 +99,14 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Clears cart state locally only — use after order creation where the
+  // backend has already consumed the cart items.
+  const resetCart = () => setCart([]);
+
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
   
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, total }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, resetCart, total }}>
       {children}
     </CartContext.Provider>
   );

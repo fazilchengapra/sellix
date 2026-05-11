@@ -22,7 +22,7 @@ const loadRazorpay = () => {
 };
 
 export const PaymentForm = () => {
-  const { clearCart, total, cart } = useCart();
+  const { resetCart, total, cart } = useCart();
   const { showToast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -77,7 +77,7 @@ export const PaymentForm = () => {
                         order_id: order.id
                     }).catch(() => {}); // Ignore error if endpoint doesn't exist yet
                 } finally {
-                    await clearCart();
+                    resetCart();
                     showToast("Payment successful! Order placed.", "success");
                     navigate('/orders');
                 }

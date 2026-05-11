@@ -30,7 +30,7 @@ const loadRazorpay = () =>
 
 // ── Component ──────────────────────────────────────────────────────────
 export const CheckoutPayment = ({ finalTotal }) => {
-  const { clearCart, total, cart } = useCart();
+  const { resetCart, total, cart } = useCart();
   const { showToast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -86,7 +86,7 @@ export const CheckoutPayment = ({ finalTotal }) => {
               })
               .catch(() => {});
           } finally {
-            await clearCart();
+            resetCart();
             showToast("Payment successful! Order placed.", "success");
             navigate("/orders");
           }
