@@ -9,6 +9,7 @@ import Wishlist from "./pages/Wishlist";
 import Payment from "./pages/Payment";
 import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
+import Profile from "./pages/Profile";
 import OrderDetails from "./pages/OrderDetails";
 import { PublicRoute, PrivateRoute, AdminRoute, ShopRoute } from "./components/AuthGuard";
 
@@ -69,6 +70,7 @@ function App() {
                     <Route path="/checkout" element={<Checkout />} />
                     <Route path="/orders" element={<Orders />} />
                     <Route path="/orders/:id" element={<OrderDetails />} />
+                    <Route path="/profile" element={<Profile />} />
                   </Route>
                 </Route>
               </Route>

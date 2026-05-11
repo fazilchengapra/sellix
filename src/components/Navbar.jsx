@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { ShoppingCart, Heart, LogOut, Menu, X, Package } from "lucide-react";
+import { ShoppingCart, Heart, LogOut, Menu, X, Package, User } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -79,6 +79,13 @@ const Navbar = () => {
                     count={cart.length}
                     label="Cart"
                   />
+                  <Link
+                    to="/profile"
+                    className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-600 to-blue-400 flex items-center justify-center text-white text-xs font-bold hover:shadow-lg hover:shadow-blue-600/20 transition-all"
+                    title="Profile"
+                  >
+                    {(user?.name || user?.username || "U").charAt(0).toUpperCase()}
+                  </Link>
                   <button
                     onClick={handleLogout}
                     className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"

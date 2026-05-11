@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { LogOut, Home, Package } from 'lucide-react';
+import { LogOut, Home, Package, User } from 'lucide-react';
 
 export const MobileMenu = ({ isOpen, user, onLogout, onClose }) => {
   if (!isOpen) return null;
@@ -25,13 +25,23 @@ export const MobileMenu = ({ isOpen, user, onLogout, onClose }) => {
         </Link>
 
         {user ? (
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center space-x-3 text-red-600 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors text-left"
-          >
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium">Logout</span>
-          </button>
+          <>
+            <Link 
+              to="/profile" 
+              className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+              onClick={onClose}
+            >
+              <User className="w-5 h-5" />
+              <span className="font-medium">My Account</span>
+            </Link>
+            <button
+              onClick={onLogout}
+              className="w-full flex items-center space-x-3 text-red-600 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors text-left"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium">Logout</span>
+            </button>
+          </>
         ) : (
           <div className="grid grid-cols-2 gap-4 pt-2">
             <Link
