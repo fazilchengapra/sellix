@@ -32,7 +32,7 @@ const OrderItemsList = ({ order, onReturnItem }) => {
           return (
             <div key={idx} className="py-4 first:pt-0 last:pb-0">
               <div className="flex gap-4">
-                <div className="w-24 h-24 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0">
+                <div className="w-24 h-24 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0">
                   <img
                     src={item.image}
                     alt={item.product_name}

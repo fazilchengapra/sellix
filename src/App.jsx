@@ -7,6 +7,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import Payment from "./pages/Payment";
+import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
 import { PublicRoute, PrivateRoute, AdminRoute, ShopRoute } from "./components/AuthGuard";
@@ -65,6 +66,7 @@ function App() {
                     <Route path="/cart" element={<Cart />} />
                     <Route path="/wishlist" element={<Wishlist />} />
                     <Route path="/payment" element={<Payment />} />
+                    <Route path="/checkout" element={<Checkout />} />
                     <Route path="/orders" element={<Orders />} />
                     <Route path="/orders/:id" element={<OrderDetails />} />
                   </Route>

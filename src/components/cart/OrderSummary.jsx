@@ -34,7 +34,7 @@ export const OrderSummary = () => {
 
       <Button 
         className="w-full py-6 text-lg" 
-        onClick={() => navigate('/payment')}
+        onClick={() => navigate('/checkout')}
       >
         Proceed to Checkout
       </Button>
