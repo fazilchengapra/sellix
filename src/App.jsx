@@ -3,6 +3,8 @@ import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
@@ -55,6 +57,8 @@ function App() {
                   <Route path="/" element={<Home />} />
                   <Route path="/products" element={<Products />} />
                   <Route path="/product/:id" element={<ProductDetails />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
 
                   {/* Public Routes*/}
                   <Route element={<PublicRoute />}>
