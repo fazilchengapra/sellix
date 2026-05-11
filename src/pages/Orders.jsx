@@ -23,8 +23,9 @@ const Orders = () => {
   const fetchOrders = async () => {
     if (!user) return;
     try {
-      const response = await api.get(`/orders?userId=${user.id}`);
-      const sortedOrders = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const response = await api.get(`/orders/`);
+      const ordersData = response.data?.results || response.data || [];
+      const sortedOrders = Array.isArray(ordersData) ? ordersData.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) : [];
       setOrders(sortedOrders);
     } catch (error) {
       console.error("Error fetching orders", error);
@@ -72,13 +73,13 @@ const Orders = () => {
                         </div>
                         <div>
                             <div className="flex items-center gap-2 mb-1">
-                                <span className="font-bold text-gray-900">Order #{order.id.substring(0, 8).toUpperCase()}</span>
+                                <span className="font-bold text-gray-900">Order #{String(order.id).substring(0, 8).toUpperCase()}</span>
                                 <Badge variant={order.status === 'Delivered' ? 'success' : 'default'} className="text-[10px] px-2 py-0.5">
                                     {order.status}
                                 </Badge>
                             </div>
                             <p className="text-sm text-gray-500 mb-1">
-                                Placed on {new Date(order.createdAt).toLocaleDateString()}
+                                Placed on {new Date(order.created_at).toLocaleDateString()}
                             </p>
                             <p className="text-sm font-medium text-gray-900">
                                 {formatPrice(order.total)} • {order.items.length} item{order.items.length > 1 ? 's' : ''}
@@ -95,8 +96,8 @@ const Orders = () => {
                 {/* Preview Items (First 3) */}
                 <div className="mt-6 flex flex-wrap gap-2">
                     {order.items.slice(0, 3).map((item, i) => (
-                        <div key={i} className="w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden relative" title={item.productName}>
-                            <img src={item.image} alt={item.productName} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
+                        <div key={i} className="w-16 h-16 rounded-lg bg-gray-50 border border-gray-100 overflow-hidden relative" title={item.product_name}>
+                            <img src={item.image} alt={item.product_name} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity" />
                         </div>
                     ))}
                     {order.items.length > 3 && (

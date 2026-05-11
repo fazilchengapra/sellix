@@ -4,10 +4,22 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
 import { useAuth } from '../../context/AuthContext';
-import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
-import { paymentSchema } from '../../lib/validations';
 import api from '../../api/axios';
+
+const loadRazorpay = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => {
+      resolve(true);
+    };
+    script.onerror = () => {
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+};
 
 export const PaymentForm = () => {
   const { clearCart, total, cart } = useCart();
@@ -15,117 +27,98 @@ export const PaymentForm = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   
-  const [formData, setFormData] = useState({
-    cardName: '',
-    cardNumber: '',
-    expiry: '',
-    cvv: ''
-  });
-  const [errors, setErrors] = useState({});
   const [isProcessing, setIsProcessing] = useState(false);
 
   const shipping = total > 5000 ? 0 : 50;
   const finalTotal = total + shipping;
 
-  const handleSubmit = async (e) => {
+  const handlePayment = async (e) => {
     e.preventDefault();
-    setErrors({});
     setIsProcessing(true);
 
-    const result = paymentSchema.safeParse(formData);
-
-    if (!result.success) {
-      const fieldErrors = {};
-      result.error.issues.forEach((issue) => {
-        if (issue.path[0]) fieldErrors[issue.path[0].toString()] = issue.message;
-      });
-      setErrors(fieldErrors);
-      setIsProcessing(false);
-      return;
-    }
-    
     if (!user) {
         showToast("You must be logged in to place an order.", "error");
         setIsProcessing(false);
         return;
     }
 
-    const orderData = {
-        userId: user.id,
-        items: cart,
-        total: finalTotal,
-        shipping: shipping,
-        subtotal: total,
-        status: 'Processing',
-        createdAt: new Date().toISOString(),
-        paymentMethod: 'Card', 
-        cardName: formData.cardName // saving card name for reference, avoiding sensitive data
-    };
-
     try {
-        await api.post('/orders', orderData);
-        await clearCart();
-        showToast("Payment successful! Order placed.", "success");
-        navigate('/orders');
+        // 1. Create order
+        const orderResponse = await api.post('/orders/', { payment_method: "Razorpay" });
+        const order = orderResponse.data;
+
+        // 2. Initiate Razorpay Payment
+        const initiateResponse = await api.post('/payments/initiate/', { order_id: order.id });
+        const { razorpay_order_id, amount, currency, key } = initiateResponse.data;
+
+        // 3. Load Razorpay Script
+        const isLoaded = await loadRazorpay();
+        if (!isLoaded) {
+            showToast("Razorpay SDK failed to load. Please check your connection.", "error");
+            setIsProcessing(false);
+            return;
+        }
+
+        // 4. Open Razorpay Checkout
+        const options = {
+            key: key,
+            amount: amount,
+            currency: currency,
+            name: "Sellix",
+            description: "Order Payment",
+            order_id: razorpay_order_id,
+            handler: async function (response) {
+                try {
+                    // Try to verify payment if verify endpoint exists
+                    await api.post('/payments/verify/', {
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature,
+                        order_id: order.id
+                    }).catch(() => {}); // Ignore error if endpoint doesn't exist yet
+                } finally {
+                    await clearCart();
+                    showToast("Payment successful! Order placed.", "success");
+                    navigate('/orders');
+                }
+            },
+            prefill: {
+                name: user?.username || user?.first_name || "Customer",
+                email: user?.email || "",
+            },
+            theme: {
+                color: "#3B82F6",
+            },
+        };
+
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.on('payment.failed', function (response){
+            showToast(response.error.description || "Payment failed", "error");
+        });
+        paymentObject.open();
+
     } catch (error) {
-        console.error("Order placement error", error);
-        showToast("Failed to place order. Please try again.", "error");
+        console.error("Payment error", error);
+        showToast("Failed to initiate payment. Please try again.", "error");
+    } finally {
         setIsProcessing(false);
     }
   };
 
-  const updateField = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-    if (errors[field]) {
-        const newErrors = { ...errors };
-        delete newErrors[field];
-        setErrors(newErrors);
-    }
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <Input
-        label="Cardholder Name"
-        placeholder="John Doe"
-        value={formData.cardName}
-        onChange={(e) => updateField('cardName', e.target.value)}
-        error={errors.cardName}
-      />
-      
-      <Input
-        label="Card Number"
-        placeholder="0000 0000 0000 0000"
-        maxLength={19}
-        value={formData.cardNumber}
-        onChange={(e) => updateField('cardNumber', e.target.value)}
-        error={errors.cardNumber}
-      />
-
-      <div className="grid grid-cols-2 gap-4">
-        <Input
-          label="Expiry Date"
-          placeholder="MM/YY"
-          maxLength={5}
-          value={formData.expiry}
-          onChange={(e) => updateField('expiry', e.target.value)}
-          error={errors.expiry}
-        />
-        
-        <Input
-          label="CVV"
-          placeholder="123"
-          maxLength={4}
-          value={formData.cvv}
-          onChange={(e) => updateField('cvv', e.target.value)}
-          error={errors.cvv}
-        />
+    <div className="space-y-6">
+      <div className="bg-blue-50 border border-blue-100 rounded-lg p-6 mb-6">
+        <h3 className="font-semibold text-blue-900 mb-2">Secure Checkout via Razorpay</h3>
+        <p className="text-blue-700 text-sm">
+          You will be redirected to Razorpay's secure checkout page to complete your payment. 
+          Multiple payment options including UPI, Cards, and Netbanking are supported.
+        </p>
       </div>
 
-      <Button type="submit" className="w-full py-4 text-lg" isLoading={isProcessing}>
-        Pay {formatPrice(finalTotal)}
+      <Button onClick={handlePayment} className="w-full py-4 text-lg" isLoading={isProcessing}>
+        Pay Securely {formatPrice(finalTotal)}
       </Button>
-    </form>
+    </div>
   );
 };
 

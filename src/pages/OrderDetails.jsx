@@ -35,7 +35,7 @@ const OrderDetails = () => {
   const fetchOrder = async () => {
     try {
       const response = await api.get(`/orders/${id}`);
-      if(response.data.userId !== user.id && user.role !== 'admin') {
+      if(response.data.user !== user.id && user.role !== 'admin') {
           // If not admin and not owner
           // Ideally handle 403 or redirect
       }
@@ -52,7 +52,7 @@ const OrderDetails = () => {
     if (pendingStatus === order.status) return;
     setSaving(true);
     try {
-      await api.put(`/orders/${order.id}`, {...order, status: pendingStatus });
+      await api.patch(`/orders/${order.id}/`, { status: pendingStatus });
       setOrder({ ...order, status: pendingStatus });
       showToast("Order status updated", "success");
     } catch (err) {
@@ -66,8 +66,7 @@ const OrderDetails = () => {
   const handleCancelOrder = async () => {
     setCancelling(true);
     try {
-      await api.put(`/orders/${order.id}`, {
-        ...order,
+      await api.patch(`/orders/${order.id}/`, {
         status: "Cancelled",
       });
       setOrder({ ...order, status: "Cancelled" });
@@ -109,11 +108,11 @@ const OrderDetails = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Order #{order.id.substring(0, 8).toUpperCase()}
+            Order #{String(order.id).substring(0, 8).toUpperCase()}
           </h1>
           <p className="text-gray-500 mt-1">
-            Placed on {new Date(order.createdAt).toLocaleDateString()} at{" "}
-            {new Date(order.createdAt).toLocaleTimeString()}
+            Placed on {new Date(order.created_at).toLocaleDateString()} at{" "}
+            {new Date(order.created_at).toLocaleTimeString()}
           </p>
         </div>
 

@@ -10,12 +10,12 @@ const OrderPaymentInfo = ({ order }) => {
         <p className="flex justify-between mb-2">
           <span>Payment Method</span>
           <span className="font-medium text-gray-900">
-            {order.paymentMethod}
+            {order.payment_method}
           </span>
         </p>
-        {order.cardName && (
-          <p className="text-xs text-gray-500">
-            Card holder: {order.cardName}
+        {order.card_name && (
+          <p className="text-sm text-gray-500 mt-2">
+            Card holder: {order.card_name}
           </p>
         )}
       </div>

@@ -8,7 +8,7 @@ const OrderItemsList = ({ order, onReturnItem }) => {
     const deliveryDate = currentOrder.deliveredAt
       ? new Date(currentOrder.deliveredAt)
       : new Date(
-          new Date(currentOrder.createdAt).getTime() + 2 * 24 * 60 * 60 * 1000
+          new Date(currentOrder.created_at).getTime() + 2 * 24 * 60 * 60 * 1000
         );
     const currentDate = new Date();
     const diffTime = Math.abs(currentDate - deliveryDate);
@@ -24,7 +24,7 @@ const OrderItemsList = ({ order, onReturnItem }) => {
       </h2>
       <div className="divide-y divide-gray-100">
         {order.items.map((item, idx) => {
-          const returnPolicyDays = item.productName.includes("Sneaker")
+          const returnPolicyDays = item.product_name?.includes("Sneaker")
             ? 5
             : 7;
           const canReturn = isReturnable(order, returnPolicyDays);
@@ -35,7 +35,7 @@ const OrderItemsList = ({ order, onReturnItem }) => {
                 <div className="w-24 h-24 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden flex-shrink-0">
                   <img
                     src={item.image}
-                    alt={item.productName}
+                    alt={item.product_name}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -43,7 +43,7 @@ const OrderItemsList = ({ order, onReturnItem }) => {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-semibold text-gray-900">
-                        {item.productName}
+                        {item.product_name}
                       </h3>
                       <p className="text-sm text-gray-500 mt-1">
                         Size: {item.size} • Color: {item.color}
@@ -64,7 +64,7 @@ const OrderItemsList = ({ order, onReturnItem }) => {
                         <button
                           onClick={() =>
                             onReturnItem(
-                              item.productName,
+                              item.product_name,
                               returnPolicyDays
                             )
                           }
