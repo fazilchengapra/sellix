@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../../api/axios';
 import Spinner from '../../components/ui/Spinner';
 import ProductModal from '../../components/admin/ProductModal';
@@ -11,8 +11,10 @@ import ProductsTable from '../../components/admin/products/ProductsTable';
 
 const AdminProducts = () => {
     const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(true);
+    const [tableLoading, setTableLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
@@ -31,15 +33,28 @@ const AdminProducts = () => {
         loading: false
     });
 
+    // Debounce search: wait 500ms after user stops typing
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    // Reset to page 1 when debounced search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [debouncedSearch]);
+
     const fetchProducts = useCallback(async () => {
       try {
-        setLoading(true);
+        setTableLoading(true);
         const params = {
           page: currentPage,
           page_size: itemsPerPage,
         };
-        if (searchQuery.trim()) {
-          params.search = searchQuery.trim();
+        if (debouncedSearch.trim()) {
+          params.search = debouncedSearch.trim();
         }
         const response = await api.get('/admin/product/list/', { params });
         setProducts(response.data.results);
@@ -47,18 +62,14 @@ const AdminProducts = () => {
       } catch (error) {
         console.error("Error fetching products", error);
       } finally {
-        setLoading(false);
+        setInitialLoading(false);
+        setTableLoading(false);
       }
-    }, [currentPage, searchQuery]);
+    }, [currentPage, debouncedSearch]);
   
     useEffect(() => {
       fetchProducts();
     }, [fetchProducts]);
-
-    // Reset to page 1 when search changes
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchQuery]);
   
     const handleAdd = () => {
         setCurrentProduct(null);
@@ -111,7 +122,7 @@ const AdminProducts = () => {
         }
     };
   
-    if (loading) return <div className="h-96 flex items-center justify-center"><Spinner size={40} /></div>;
+    if (initialLoading) return <div className="h-96 flex items-center justify-center"><Spinner size={40} /></div>;
   
     return (
       <div className="space-y-6">
@@ -120,11 +131,13 @@ const AdminProducts = () => {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <ProductsToolbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
   
-          <ProductsTable 
-              products={products}
-              onEdit={handleEdit}
-              onDelete={confirmDelete} 
-          />
+          <div className={`relative transition-opacity duration-200 ${tableLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+            <ProductsTable 
+                products={products}
+                onEdit={handleEdit}
+                onDelete={confirmDelete} 
+            />
+          </div>
           
           {products.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
