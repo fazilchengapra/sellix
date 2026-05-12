@@ -9,7 +9,7 @@ const OrderActions = ({
     saving, 
     onCancelClick 
 }) => {
-  if (user?.role === "admin") {
+  if (user?.is_staff) {
     return (
       <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg border border-gray-200">
         <span className="text-sm font-medium text-gray-700">Status:</span>

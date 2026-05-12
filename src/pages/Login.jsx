@@ -55,7 +55,14 @@ const Login = () => {
         if (success.blocked)
           return showToast("The user has been blocked!", "error");
         showToast("Login successful! Welcome back", "success");
-        navigate("/");
+
+        // Redirect admin (is_staff) users to admin dashboard
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        if (storedUser?.is_staff) {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
         setErrors({ email: "Invalid credentials or user not found" });
         showToast("Invalid credentials or user not found", "error");

@@ -4,7 +4,7 @@ import Spinner from "./ui/Spinner";
 
 export const PrivateRoute = () => {
   const { isAuthenticated, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -21,7 +21,7 @@ export const PrivateRoute = () => {
 };
 
 export const PublicRoute = () => {
-  const { isAuthenticated, user, loading } = useAuth();
+  const { isAuthenticated, isAdmin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -32,7 +32,7 @@ export const PublicRoute = () => {
   }
 
   if (isAuthenticated) {
-    if (user?.role === 'admin') {
+    if (isAdmin) {
       return <Navigate to="/admin" replace />;
     }
     return <Navigate to="/" replace />;
@@ -42,29 +42,7 @@ export const PublicRoute = () => {
 };
 
 export const AdminRoute = () => {
-    const { isAuthenticated, user, loading } = useAuth();
-  
-    if (loading) {
-      return (
-        <div className="flex justify-center items-center h-screen">
-          <Spinner size={40} />
-        </div>
-      );
-    }
-  
-    if (!isAuthenticated) {
-      return <Navigate to="/login" replace />;
-    }
-    
-    if (user?.role !== 'admin') {
-        return <Navigate to="/" replace />;
-    }
-  
-    return <Outlet />;
-};
-
-export const ShopRoute = () => {
-  const { user, loading } = useAuth();
+  const { isAuthenticated, isAdmin, loading } = useAuth();
 
   if (loading) {
     return (
@@ -74,7 +52,31 @@ export const ShopRoute = () => {
     );
   }
 
-  if (user?.role === 'admin') {
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Only users with is_staff=true can access admin pages
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+};
+
+export const ShopRoute = () => {
+  const { isAdmin, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner size={40} />
+      </div>
+    );
+  }
+
+  // Admin (is_staff) users cannot access normal user pages — redirect to admin
+  if (isAdmin) {
     return <Navigate to="/admin" replace />;
   }
 

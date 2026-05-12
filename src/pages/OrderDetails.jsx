@@ -35,7 +35,7 @@ const OrderDetails = () => {
   const fetchOrder = async () => {
     try {
       const response = await api.get(`/orders/${id}`);
-      if(response.data.user !== user.id && user.role !== 'admin') {
+      if(response.data.user !== user.id && !user.is_staff) {
           // If not admin and not owner
           // Ideally handle 403 or redirect
       }

@@ -47,9 +47,9 @@ const UsersTable = ({ users, onDelete }) => {
               </td>
               <td className="px-6 py-4">
                 <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === "admin" ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-800"}`}
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.is_staff ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-800"}`}
                 >
-                  {user.role || "User"}
+                  {user.is_staff ? "Admin" : "User"}
                 </span>
               </td>
               <td className="px-6 py-4">
