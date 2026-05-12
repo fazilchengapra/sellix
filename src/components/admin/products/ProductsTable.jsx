@@ -19,8 +19,8 @@ const ProductsTable = ({ products, onEdit, onDelete }) => {
               <td className="px-6 py-4">
                 <div className="flex items-center gap-4 min-w-[200px]">
                   <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200">
-                     {product.colors?.[0]?.images?.[0] && (
-                       <img src={product.colors[0].images[0]} alt={product.name} className="w-full h-full object-cover" />
+                     {product.colors?.[0]?.images?.[0]?.image && (
+                       <img src={product.colors[0].images[0].image} alt={product.name} className="w-full h-full object-cover" />
                      )}
                   </div>
                   <div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../../api/axios';
 import Spinner from '../../components/ui/Spinner';
 import ProductModal from '../../components/admin/ProductModal';
@@ -14,6 +14,7 @@ const AdminProducts = () => {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,21 +30,35 @@ const AdminProducts = () => {
         onConfirm: () => {},
         loading: false
     });
-  
-    useEffect(() => {
-      fetchProducts();
-    }, []);
-  
-    const fetchProducts = async () => {
+
+    const fetchProducts = useCallback(async () => {
       try {
-        const response = await api.get('/products');
-        setProducts(response.data);
+        setLoading(true);
+        const params = {
+          page: currentPage,
+          page_size: itemsPerPage,
+        };
+        if (searchQuery.trim()) {
+          params.search = searchQuery.trim();
+        }
+        const response = await api.get('/admin/product/list/', { params });
+        setProducts(response.data.results);
+        setTotalPages(Math.ceil(response.data.count / itemsPerPage));
       } catch (error) {
         console.error("Error fetching products", error);
       } finally {
         setLoading(false);
       }
-    };
+    }, [currentPage, searchQuery]);
+  
+    useEffect(() => {
+      fetchProducts();
+    }, [fetchProducts]);
+
+    // Reset to page 1 when search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchQuery]);
   
     const handleAdd = () => {
         setCurrentProduct(null);
@@ -70,9 +85,9 @@ const AdminProducts = () => {
           setAlertConfig(prev => ({ ...prev, loading: true }));
           try {
               await api.delete(`/products/${id}`);
-              setProducts(products.filter(p => p.id !== id));
               showToast("Product deleted successfully", "success");
               setAlertConfig(prev => ({ ...prev, isOpen: false }));
+              fetchProducts(); // Re-fetch from server after delete
           } catch (error) {
               console.error(error);
               showToast("Failed to delete product", "error");
@@ -83,33 +98,18 @@ const AdminProducts = () => {
     const handleModalSubmit = async (productData) => {
         try {
             if (currentProduct) {
-                const res = await api.put(`/products/${currentProduct.id}`, productData);
-                setProducts(products.map(p => p.id === currentProduct.id ? res.data : p));
+                await api.put(`/products/${currentProduct.id}`, productData);
                 showToast("Product updated successfully", "success");
             } else {
-                const res = await api.post('/products', productData);
-                setProducts([...products, res.data]);
+                await api.post('/products', productData);
                 showToast("Product added successfully", "success");
             }
+            fetchProducts(); // Re-fetch from server after add/edit
         } catch (error) {
             console.error(error);
             showToast("Operation failed", "error");
         }
     };
-  
-    const filteredProducts = products.filter(product =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.brand.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchQuery]);
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   
     if (loading) return <div className="h-96 flex items-center justify-center"><Spinner size={40} /></div>;
   
@@ -121,12 +121,12 @@ const AdminProducts = () => {
           <ProductsToolbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
   
           <ProductsTable 
-              products={currentProducts}
+              products={products}
               onEdit={handleEdit}
               onDelete={confirmDelete} 
           />
           
-          {filteredProducts.length === 0 ? (
+          {products.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
                   No products found matching your search.
               </div>
