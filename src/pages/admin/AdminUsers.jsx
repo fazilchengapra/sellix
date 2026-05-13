@@ -32,7 +32,7 @@ const AdminUsers = () => {
   
     const fetchUsers = async () => {
       try {
-        const response = await api.get('/users');
+        const response = await api.get('/admin/users/');
         setUsers(response.data);
       } catch (error) {
         console.error("Error fetching users", error);
@@ -55,15 +55,27 @@ const AdminUsers = () => {
     const handleDelete = async (id) => {
           setAlertConfig(prev => ({ ...prev, loading: true }));
           try {
-              await api.delete(`/users/${id}`);
+              const response = await api.delete(`/admin/users/${id}/`);
               setUsers(users.filter(u => u.id !== id));
-              showToast("User deleted successfully", "success");
+              showToast(response.data.message || "User deleted successfully", "success");
               setAlertConfig(prev => ({ ...prev, isOpen: false }));
           } catch (error) {
               console.error(error);
               showToast("Failed to delete user", "error");
               setAlertConfig(prev => ({ ...prev, isOpen: false }));
           }
+    };
+
+    const handleToggleBlock = async (user) => {
+        try {
+            const response = await api.post(`/admin/users/${user.id}/block-unblock/`);
+            const newStatus = !user.is_active;
+            setUsers(users.map(u => u.id === user.id ? { ...u, is_active: newStatus } : u));
+            showToast(response.data.message || `User ${newStatus ? 'unblocked' : 'blocked'} successfully`, "success");
+        } catch (error) {
+            console.error(error);
+            showToast("Failed to update user status", "error");
+        }
     };
   
     const filteredUsers = users.filter(user =>
@@ -89,7 +101,7 @@ const AdminUsers = () => {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <UsersToolbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
   
-          <UsersTable users={currentUsers} onDelete={confirmDelete} />
+          <UsersTable users={currentUsers} onDelete={confirmDelete} onToggleBlock={handleToggleBlock} />
           
            <Pagination 
               currentPage={currentPage}

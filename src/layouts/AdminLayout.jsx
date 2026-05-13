@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import AdminSidebar from "../components/admin/layout/AdminSidebar";
 import AdminHeader from "../components/admin/layout/AdminHeader";
+import { ToastContainer } from "../components/ToastContainer";
 
 const AdminLayout = () => {
   const location = useLocation();
@@ -37,6 +38,7 @@ const AdminLayout = () => {
           <Outlet />
         </div>
       </main>
+      <ToastContainer />
     </div>
   );
 };

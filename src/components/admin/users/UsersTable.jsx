@@ -1,14 +1,16 @@
-import { Trash2, Mail } from "lucide-react";
+import { Trash2, Shield, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 import AlertDialog from "../../ui/AlertDialog";
-import api from "../../../api/axios";
 
-const UsersTable = ({ users, onDelete }) => {
+const UsersTable = ({ users, onDelete, onToggleBlock }) => {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [selectedUser, setSelectedUser] = useState('')
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  const handleBlockUser = async() => {
-    await api.put(`users/${selectedUser.id}`, { ...selectedUser, isBlocked: true });
+  const handleBlockUser = async () => {
+    if (selectedUser) {
+      await onToggleBlock(selectedUser);
+      setShowCancelDialog(false);
+    }
   };
   return (
     <div className="overflow-x-auto">
@@ -47,14 +49,14 @@ const UsersTable = ({ users, onDelete }) => {
               </td>
               <td className="px-6 py-4">
                 <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.is_staff ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-800"}`}
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.role === 'admin' ? "bg-purple-100 text-purple-800" : "bg-gray-100 text-gray-800"}`}
                 >
-                  {user.is_staff ? "Admin" : "User"}
+                  {user.role === 'admin' ? "Admin" : "Customer"}
                 </span>
               </td>
               <td className="px-6 py-4">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Active
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${user.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                  {user.is_active ? "Active" : "Blocked"}
                 </span>
               </td>
               <td className="px-6 py-4 text-right">
@@ -65,8 +67,9 @@ const UsersTable = ({ users, onDelete }) => {
                       setShowCancelDialog(true)
                     }}
                     className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-colors"
+                    title={user.is_active ? "Block User" : "Unblock User"}
                   >
-                    <Mail size={18} />
+                    {user.is_active ? <ShieldAlert size={18} /> : <Shield size={18} />}
                   </button>
                   <button
                     onClick={() => onDelete(user.id)}
@@ -92,12 +95,11 @@ const UsersTable = ({ users, onDelete }) => {
         isOpen={showCancelDialog}
         onClose={() => setShowCancelDialog(false)}
         onConfirm={handleBlockUser}
-        title="Block User"
-        message="Are you sure you want to Block this user?"
-        variant="danger"
-        confirmText="Yes, Block User"
+        title={selectedUser?.is_active ? "Block User" : "Unblock User"}
+        message={`Are you sure you want to ${selectedUser?.is_active ? "block" : "unblock"} this user?`}
+        variant={selectedUser?.is_active ? "danger" : "default"}
+        confirmText={`Yes, ${selectedUser?.is_active ? "Block" : "Unblock"} User`}
         cancelText="No"
-        // loading={cancelling}
       />
     </div>
   );
