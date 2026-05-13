@@ -21,6 +21,7 @@ const AdminProducts = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
+    const [modalLoading, setModalLoading] = useState(false);
     const { showToast } = useToast();
   
     // Alert Dialog State
@@ -95,30 +96,40 @@ const AdminProducts = () => {
     const handleDelete = async (id) => {
           setAlertConfig(prev => ({ ...prev, loading: true }));
           try {
-              await api.delete(`/products/${id}`);
+              await api.delete(`/admin/product/${id}/delete/`);
               showToast("Product deleted successfully", "success");
               setAlertConfig(prev => ({ ...prev, isOpen: false }));
-              fetchProducts(); // Re-fetch from server after delete
+              fetchProducts();
           } catch (error) {
               console.error(error);
-              showToast("Failed to delete product", "error");
-              setAlertConfig(prev => ({ ...prev, isOpen: false }));
+              const msg = error.response?.data?.detail
+                  || error.response?.data?.message
+                  || "Failed to delete product";
+              showToast(msg, "error");
+          } finally {
+              setAlertConfig(prev => ({ ...prev, loading: false }));
           }
     };
   
-    const handleModalSubmit = async (productData) => {
+    const handleModalSubmit = async (formData) => {
+        const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+        setModalLoading(true);
         try {
             if (currentProduct) {
-                await api.put(`/products/${currentProduct.id}`, productData);
+                await api.patch(`/admin/product/${currentProduct.id}/update/`, formData, config);
                 showToast("Product updated successfully", "success");
             } else {
-                await api.post('/products', productData);
+                await api.post('/admin/product/create/', formData, config);
                 showToast("Product added successfully", "success");
             }
-            fetchProducts(); // Re-fetch from server after add/edit
+            setIsModalOpen(false);
+            fetchProducts();
         } catch (error) {
             console.error(error);
-            showToast("Operation failed", "error");
+            const msg = error.response?.data?.detail || error.response?.data?.message || "Operation failed";
+            showToast(msg, "error");
+        } finally {
+            setModalLoading(false);
         }
     };
   
@@ -157,6 +168,7 @@ const AdminProducts = () => {
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleModalSubmit}
           product={currentProduct}
+          loading={modalLoading}
         />
 
         <AlertDialog
