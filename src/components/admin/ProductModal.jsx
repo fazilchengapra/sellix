@@ -21,6 +21,10 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading }) => {
     }
   ]);
 
+  const [sizes, setSizes] = useState([
+    { size: "", stock: "" }
+  ]);
+
   const [dragActiveId, setDragActiveId] = useState(null);
 
   useEffect(() => {
@@ -46,7 +50,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading }) => {
         setColors(loadedColors);
       } else {
         setColors([{
-          id: Date.now().toString(),
           color_name: "",
           hex: "#000000",
           existingImages: [],
@@ -54,16 +57,26 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading }) => {
           newPreviews: []
         }]);
       }
+
+      if (product.sizes && product.sizes.length > 0) {
+        setSizes(product.sizes.map(s => ({
+          size_id: s.id,
+          size: s.size?.toString() || "",
+          stock: s.stock?.toString() || ""
+        })));
+      } else {
+        setSizes([{ size: "", stock: "" }]);
+      }
     } else {
       setFormData({ name: "", brand: "", category: "", price: "", discount: "0", description: "" });
       setColors([{
-        id: Date.now().toString(),
         color_name: "",
         hex: "#000000",
         existingImages: [],
         newFiles: [],
         newPreviews: []
       }]);
+      setSizes([{ size: "", stock: "" }]);
     }
     setDragActiveId(null);
   }, [product, isOpen]);
@@ -148,6 +161,23 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading }) => {
     });
   };
 
+  // --- Size helpers ---
+  const addSize = () => {
+    setSizes(prev => [...prev, { size: "", stock: "" }]);
+  };
+
+  const removeSize = (index) => {
+    setSizes(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateSize = (index, field, value) => {
+    setSizes(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (loading) return;
@@ -173,6 +203,15 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading }) => {
     });
 
     data.append("colors", JSON.stringify(colorsMeta));
+
+    const sizesMeta = sizes
+      .filter(s => s.size && s.stock)
+      .map(s => ({
+        id: s.size_id || null,
+        size: parseInt(s.size),
+        stock: parseInt(s.stock)
+      }));
+    data.append("sizes", JSON.stringify(sizesMeta));
 
     onSubmit(data);
   };
@@ -421,6 +460,65 @@ const ProductModal = ({ isOpen, onClose, onSubmit, product, loading }) => {
                   </div>
                 );
               })}
+            </div>
+          </div>
+
+          {/* Sizes & Stock Section */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h3 className="text-lg font-semibold text-gray-900">Sizes & Stock</h3>
+              <button
+                type="button"
+                onClick={addSize}
+                className="text-sm px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-800 font-medium flex items-center gap-1 transition-colors"
+              >
+                <Plus size={16} /> Add Size
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {sizes.map((sizeItem, sizeIndex) => (
+                <div key={sizeIndex} className="flex items-end gap-3">
+                  <div className="flex-1">
+                    {sizeIndex === 0 && (
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
+                    )}
+                    <input
+                      required
+                      type="number"
+                      min="1"
+                      value={sizeItem.size}
+                      onChange={(e) => updateSize(sizeIndex, 'size', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black outline-none"
+                      placeholder="e.g. 42"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    {sizeIndex === 0 && (
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Stock</label>
+                    )}
+                    <input
+                      required
+                      type="number"
+                      min="0"
+                      value={sizeItem.stock}
+                      onChange={(e) => updateSize(sizeIndex, 'stock', e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black outline-none"
+                      placeholder="e.g. 10"
+                    />
+                  </div>
+                  {sizes.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSize(sizeIndex)}
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mb-0.5"
+                      title="Remove Size"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
