@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import api from "../api/axios";
 import { Spinner } from "../components/ui/Spinner";
@@ -15,6 +15,8 @@ import OrderCostSummary from "../components/order/OrderCostSummary";
 
 const OrderDetails = () => {
   const { id } = useParams();
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [pendingStatus, setPendingStatus] = useState("");
@@ -34,7 +36,9 @@ const OrderDetails = () => {
 
   const fetchOrder = async () => {
     try {
-      const response = await api.get(`/orders/${id}`);
+      const numericId = String(id).replace('ORD-', '');
+      const endpoint = isAdmin ? `/admin/orders/${numericId}/` : `/orders/${numericId}/`;
+      const response = await api.get(endpoint);
       if(response.data.user !== user.id && !user.is_staff) {
           // If not admin and not owner
           // Ideally handle 403 or redirect
@@ -52,8 +56,10 @@ const OrderDetails = () => {
     if (pendingStatus === order.status) return;
     setSaving(true);
     try {
-      await api.patch(`/orders/${order.id}/`, { status: pendingStatus });
-      setOrder({ ...order, status: pendingStatus });
+      const numericId = String(order.id).replace('ORD-', '');
+      const endpoint = isAdmin ? `/admin/orders/${numericId}/` : `/orders/${numericId}/`;
+      const response = await api.patch(endpoint, { status: pendingStatus });
+      setOrder(response.data);
       showToast("Order status updated", "success");
     } catch (err) {
       console.error(err);
@@ -66,10 +72,12 @@ const OrderDetails = () => {
   const handleCancelOrder = async () => {
     setCancelling(true);
     try {
-      await api.patch(`/orders/${order.id}/`, {
+      const numericId = String(order.id).replace('ORD-', '');
+      const endpoint = isAdmin ? `/admin/orders/${numericId}/` : `/orders/${numericId}/`;
+      const response = await api.patch(endpoint, {
         status: "Cancelled",
       });
-      setOrder({ ...order, status: "Cancelled" });
+      setOrder(response.data);
       showToast("Order cancelled successfully", "success");
       setShowCancelDialog(false);
     } catch (err) {
@@ -98,7 +106,7 @@ const OrderDetails = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <Link
-        to="/orders"
+        to={isAdmin ? "/admin/orders" : "/orders"}
         className="inline-flex items-center text-gray-500 hover:text-black mb-6 transition-colors"
       >
         <ArrowLeft size={20} className="mr-2" />

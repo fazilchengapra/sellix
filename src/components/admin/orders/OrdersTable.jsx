@@ -50,7 +50,7 @@ const OrdersTable = ({ orders, onNavigate, onDelete }) => {
               className="hover:bg-gray-50 transition-colors group"
             >
               <td className="px-6 py-4 font-mono text-sm font-medium text-gray-900 whitespace-nowrap">
-                #{order.id.split("-")[0]}
+                #{order.id}
               </td>
               <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
                 {new Date(order.createdAt).toLocaleDateString()}

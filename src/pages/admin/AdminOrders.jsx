@@ -67,7 +67,7 @@ const AdminOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await api.get('/orders');
+      const response = await api.get('/admin/orders/');
       setOrders(response.data);
     } catch (error) {
       console.error("Error fetching orders", error);
@@ -91,7 +91,7 @@ const AdminOrders = () => {
   const handleDeleteOrder = async (orderId) => {
       setAlertConfig(prev => ({ ...prev, loading: true }));
       try {
-          await api.delete(`/orders/${orderId}`);
+          await api.delete(`/admin/orders/${orderId}/`);
           setOrders(prev => prev.filter(o => o.id !== orderId));
           showToast("Order deleted successfully", "success");
           setAlertConfig(prev => ({ ...prev, isOpen: false }));
@@ -106,7 +106,7 @@ const AdminOrders = () => {
   const handleStatusChange = async (orderId, newStatus) => {
     try {
         
-        const response = await api.patch(`/orders/${orderId}`, {status: newStatus });
+        const response = await api.patch(`/admin/orders/${orderId}/`, {status: newStatus });
         const updatedOrder = response.data;
         setOrders(orders.map(order => order.id === orderId ? updatedOrder : order));
         if (selectedOrder && selectedOrder.id === orderId) {
