@@ -19,11 +19,13 @@ const AdminDashboard = () => {
     topUsers: [],
   });
   const [loading, setLoading] = useState(true);
+  const [days, setDays] = useState(7);
 
   useEffect(() => {
     const fetchStats = async () => {
+      setLoading(true);
       try {
-        const data = await getDashboardStats();
+        const data = await getDashboardStats(days);
         if (data) setStats(data);
       } catch (error) {
         console.error(error);
@@ -31,8 +33,9 @@ const AdminDashboard = () => {
         setLoading(false);
       }
     };
+    console.log(days);
     fetchStats();
-  }, []);
+  }, [days]);
 
   if (loading)
     return (
@@ -97,7 +100,7 @@ const AdminDashboard = () => {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <RevenueChart data={stats.chartData} />
+        <RevenueChart data={stats.chartData} days={days} onDaysChange={setDays} />
         <OrdersBarChart data={stats.chartData} />
       </div>
 

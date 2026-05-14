@@ -1,10 +1,10 @@
 import api from "./axios";
 
-export const getDashboardStats = async () => {
+export const getDashboardStats = async (days = 7) => {
     try {
         const [dashboardRes, chartRes] = await Promise.all([
             api.get('/admin/dashboard/'),
-            api.get('/admin/dashboard/orders-overview/')
+            api.get(`/admin/dashboard/orders-overview/?days=${days}`)
         ]);
 
         const { summary, topCustomers, recentOrders } = dashboardRes.data;

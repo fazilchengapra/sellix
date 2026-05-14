@@ -19,14 +19,18 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const RevenueChart = ({ data }) => {
+const RevenueChart = ({ data, days, onDaysChange }) => {
   return (
     <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div className="flex justify-between items-center mb-6">
              <h3 className="text-lg font-bold text-gray-900">Revenue Analytics</h3>
-             <select className="bg-gray-50 border-none text-sm font-medium text-gray-500 rounded-lg px-3 py-1 outline-none cursor-pointer">
-                 <option>Last 7 Days</option>
-                 <option>Last 30 Days</option>
+             <select 
+                 value={days}
+                 onChange={(e) => onDaysChange && onDaysChange(Number(e.target.value))}
+                 className="bg-gray-50 border-none text-sm font-medium text-gray-500 rounded-lg px-3 py-1 outline-none cursor-pointer"
+             >
+                 <option value={7}>Last 7 Days</option>
+                 <option value={30}>Last 30 Days</option>
              </select>
         </div>
        

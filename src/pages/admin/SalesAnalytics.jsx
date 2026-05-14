@@ -25,7 +25,7 @@ const SalesAnalytics = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/admin/analytics/");
+        const res = await api.get(`/admin/analytics/?days=${timeRange}`);
         const { summary, revenueTrend, salesByCategory, orderStatus, topProducts } = res.data;
 
         setData({
