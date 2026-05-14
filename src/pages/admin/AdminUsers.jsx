@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../../api/axios';
 import Spinner from '../../components/ui/Spinner';
 import { useToast } from '../../context/ToastContext';
@@ -10,9 +10,12 @@ import UsersTable from '../../components/admin/users/UsersTable';
 
 const AdminUsers = () => {
     const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [initialLoading, setInitialLoading] = useState(true);
+    const [tableLoading, setTableLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const itemsPerPage = 10;
     const { showToast } = useToast();
   
@@ -26,20 +29,47 @@ const AdminUsers = () => {
         loading: false
     });
   
+    // Debounce search: wait 500ms after user stops typing
     useEffect(() => {
-      fetchUsers();
-    }, []);
-  
-    const fetchUsers = async () => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchQuery);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    // Reset to page 1 when debounced search changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [debouncedSearch]);
+
+    const fetchUsers = useCallback(async () => {
       try {
-        const response = await api.get('/admin/users/');
-        setUsers(response.data);
+        setTableLoading(true);
+        const params = {
+          page: currentPage,
+          page_size: itemsPerPage,
+        };
+        if (debouncedSearch.trim()) {
+          params.search = debouncedSearch.trim();
+        }
+        const response = await api.get('/admin/users/', { params });
+        setUsers(response.data.results || response.data);
+        if (response.data.count !== undefined) {
+            setTotalPages(Math.ceil(response.data.count / itemsPerPage));
+        } else {
+            setTotalPages(1);
+        }
       } catch (error) {
         console.error("Error fetching users", error);
       } finally {
-        setLoading(false);
+        setInitialLoading(false);
+        setTableLoading(false);
       }
-    };
+    }, [currentPage, debouncedSearch]);
+
+    useEffect(() => {
+      fetchUsers();
+    }, [fetchUsers]);
   
     const confirmDelete = (userId) => {
         setAlertConfig({
@@ -78,21 +108,7 @@ const AdminUsers = () => {
         }
     };
   
-    const filteredUsers = users.filter(user =>
-      (user.name?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
-      (user.email?.toLowerCase() || '').includes(searchQuery.toLowerCase())
-    );
-
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchQuery]);
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  
-    if (loading) return <div className="h-96 flex items-center justify-center"><Spinner size={40} /></div>;
+    if (initialLoading) return <div className="h-96 flex items-center justify-center"><Spinner size={40} /></div>;
   
     return (
       <div className="space-y-6">
@@ -101,7 +117,9 @@ const AdminUsers = () => {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           <UsersToolbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
   
-          <UsersTable users={currentUsers} onDelete={confirmDelete} onToggleBlock={handleToggleBlock} />
+          <div className={`relative transition-opacity duration-200 ${tableLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+            <UsersTable users={users} onDelete={confirmDelete} onToggleBlock={handleToggleBlock} />
+          </div>
           
            <Pagination 
               currentPage={currentPage}

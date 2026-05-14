@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import Spinner from '../../components/ui/Spinner';
@@ -13,11 +13,13 @@ import OrdersTable from '../../components/admin/orders/OrdersTable';
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
-  const [filteredOrders, setFilteredOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
   
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -34,48 +36,51 @@ const AdminOrders = () => {
   
   const { showToast } = useToast();
 
+  // Debounce search: wait 500ms after user stops typing
   useEffect(() => {
-    fetchOrders();
-  }, []);
-  
+      const timer = setTimeout(() => {
+          setDebouncedSearch(searchQuery);
+      }, 500);
+      return () => clearTimeout(timer);
+  }, [searchQuery]);
 
+  // Reset to page 1 when debounced search or status filter changes
   useEffect(() => {
-      let result = orders;
-      
-      if (searchQuery) {
-          result = result.filter(o => 
-              o.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              o.userId.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-      }
+      setCurrentPage(1);
+  }, [debouncedSearch, statusFilter]);
 
-      if (statusFilter !== 'All') {
-          result = result.filter(o => o.status === statusFilter);
-      }
-      
-      // Sort by newest
-      result = result.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-      setFilteredOrders(result);
-      setCurrentPage(1); // Reset to first page on filter change
-  }, [orders, searchQuery, statusFilter]);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
-      const response = await api.get('/admin/orders/');
-      setOrders(response.data);
+      setTableLoading(true);
+      const params = {
+        page: currentPage,
+        page_size: itemsPerPage,
+      };
+      if (debouncedSearch.trim()) {
+        params.search = debouncedSearch.trim();
+      }
+      if (statusFilter !== 'All') {
+        params.status = statusFilter;
+      }
+      const response = await api.get('/admin/orders/', { params });
+      setOrders(response.data.results || response.data);
+      if (response.data.count !== undefined) {
+        setTotalPages(Math.ceil(response.data.count / itemsPerPage));
+      } else {
+        setTotalPages(1);
+      }
     } catch (error) {
       console.error("Error fetching orders", error);
       showToast("Failed to fetch orders", "error");
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setTableLoading(false);
     }
-  };
+  }, [currentPage, debouncedSearch, statusFilter]);
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const confirmDeleteOrder = (orderId) => {
       setAlertConfig({
@@ -121,7 +126,7 @@ const AdminOrders = () => {
 
   const statusOptions = ['All', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 
-  if (loading) return <div className="h-96 flex items-center justify-center"><Spinner size={40} /></div>;
+  if (initialLoading) return <div className="h-96 flex items-center justify-center"><Spinner size={40} /></div>;
 
   return (
     <div className="space-y-6">
@@ -139,11 +144,13 @@ const AdminOrders = () => {
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         <OrdersSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-        <OrdersTable 
-            orders={currentOrders} 
-            onNavigate={(id) => navigate(`/admin/orders/${id}`)}
-            onDelete={confirmDeleteOrder}
-        />
+        <div className={`relative transition-opacity duration-200 ${tableLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+          <OrdersTable 
+              orders={orders} 
+              onNavigate={(id) => navigate(`/admin/orders/${id}`)}
+              onDelete={confirmDeleteOrder}
+          />
+        </div>
         
         <div className="p-4 border-t border-gray-100">
              <Pagination 
