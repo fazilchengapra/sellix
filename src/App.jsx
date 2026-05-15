@@ -14,7 +14,12 @@ import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import Profile from "./pages/Profile";
 import OrderDetails from "./pages/OrderDetails";
-import { PublicRoute, PrivateRoute, AdminRoute, ShopRoute } from "./components/AuthGuard";
+import {
+  PublicRoute,
+  PrivateRoute,
+  AdminRoute,
+  ShopRoute,
+} from "./components/AuthGuard";
 
 // Layouts
 import MainLayout from "./layouts/MainLayout";
@@ -32,6 +37,8 @@ import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { ToastProvider } from "./context/ToastContext";
+
+
 
 function App() {
   return (
@@ -65,8 +72,14 @@ function App() {
                   <Route element={<PublicRoute />}>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
-                    <Route path="/auth/verify-account" element={<VerifyAccount />} />
-                    <Route path="/auth/verify-account/:token" element={<VerifyAccount />} />
+                    <Route
+                      path="/auth/verify-account"
+                      element={<VerifyAccount />}
+                    />
+                    <Route
+                      path="/auth/verify-account/:token"
+                      element={<VerifyAccount />}
+                    />
                   </Route>
 
                   {/* Private Routes*/}
