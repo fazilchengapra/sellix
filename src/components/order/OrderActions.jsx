@@ -44,7 +44,7 @@ const OrderActions = ({
       >
         {order.status}
       </Badge>
-      {["Pending", "Processing"].includes(order.status) && (
+      {order.status === "Pending" && (
         <button
           onClick={onCancelClick}
           className="px-3 py-1.5 bg-red-50 text-red-600 text-xs font-medium rounded-lg hover:bg-red-100 border border-red-200 transition-colors"

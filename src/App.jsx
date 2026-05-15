@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Products from "./pages/Products";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import VerifyAccount from "./pages/VerifyAccount";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import ProductDetails from "./pages/ProductDetails";
@@ -64,6 +65,8 @@ function App() {
                   <Route element={<PublicRoute />}>
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
+                    <Route path="/auth/verify-account" element={<VerifyAccount />} />
+                    <Route path="/auth/verify-account/:token" element={<VerifyAccount />} />
                   </Route>
 
                   {/* Private Routes*/}

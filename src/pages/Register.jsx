@@ -67,19 +67,24 @@ const Register = () => {
       return;
     }
 
-    const {name, email, password, adminCode} = result.data
-    // If validation passes but admin code is needed, we grab it from formData since it might not be in schema if we didn't update schema. 
-    // Actually, I should update the schema or just pass formData.adminCode directly if I don't want to enforce it in Zod for everyone.
-    // However, the cleanest way here without touching `lib/validations` (which I might not want to touch if I can avoid it, but I probably should) is to just pass it.
-    // Wait, `result.data` comes from `registerSchema.safeParse`. If `adminCode` isn't in schema, it gets stripped.
-    
-    const success = await register(name, email, password, formData.adminCode);
-    if (success) {
-      showToast(
-        `Welcome ${result.data.name}! Your account has been created`,
-        "success"
-      );
-      navigate("/");
+    const {name, email, password, adminCode, confirmPassword} = result.data
+
+
+    const response = await register(name, email, password, formData.adminCode, confirmPassword);
+    if (response.success) {
+      if (response.status === 201) {
+        showToast(
+          "Check your mail and verify your account",
+          "success"
+        );
+        navigate("/login");
+      } else {
+        showToast(
+          `Welcome ${result.data.name}! Your account has been created`,
+          "success"
+        );
+        navigate("/");
+      }
     } else {
       setErrors({ email: "User might already exist" });
       showToast("Registration failed. User might already exist", "error");

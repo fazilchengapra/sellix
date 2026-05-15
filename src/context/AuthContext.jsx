@@ -32,8 +32,8 @@ export const AuthProvider = ({ children }) => {
       // Fetch user profile using the access token
       const userResponse = await api.get("user/me/", {
         headers: {
-          Authorization: `Bearer ${access}`
-        }
+          Authorization: `Bearer ${access}`,
+        },
       });
 
       setUser(userResponse.data);
@@ -46,19 +46,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (name, email, password, adminCode = "") => {
+  const register = async (
+    name,
+    email,
+    password,
+    adminCode = "",
+    confirmPassword = "",
+  ) => {
     try {
       const role = adminCode === "ADMIN_SECRET_123" ? "admin" : "customer";
-      const newUser = { name, email, password, role };
+      const newUser = {
+        name,
+        email,
+        password,
+        role,
+        confirm_password: confirmPassword,
+      };
 
       // Call the real backend register API
-      await api.post("auth/register/", newUser);
+      const response = await api.post("auth/register/", newUser);
 
-      // Auto-login after successful registration
-      return await login(email, password);
+      return { success: true, status: response.status };
     } catch (error) {
-      console.error("Registration error", error.response?.data || error.message);
-      return false;
+      console.error(
+        "Registration error",
+        error.response?.data || error.message,
+      );
+      return { success: false, status: error.response?.status };
     }
   };
 

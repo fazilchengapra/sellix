@@ -73,16 +73,17 @@ const OrderDetails = () => {
     setCancelling(true);
     try {
       const numericId = String(order.id).replace('ORD-', '');
-      const endpoint = isAdmin ? `/admin/orders/${numericId}/` : `/orders/${numericId}/`;
-      const response = await api.patch(endpoint, {
-        status: "Cancelled",
-      });
-      setOrder(response.data);
-      showToast("Order cancelled successfully", "success");
+      const endpoint = `/orders/${numericId}/cancel/`;
+      const response = await api.post(endpoint);
+      
+      setOrder(prev => ({ ...prev, status: "Cancelled" }));
+      setPendingStatus("Cancelled");
+      showToast(response.data.message || "Order cancelled successfully", "success");
       setShowCancelDialog(false);
     } catch (err) {
       console.error(err);
-      showToast("Failed to cancel order", "error");
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || "Failed to cancel order";
+      showToast(errorMessage, "error");
     } finally {
       setCancelling(false);
     }
