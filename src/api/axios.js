@@ -3,26 +3,17 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 const api = axios.create({
   baseURL: API_URL,
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// ✅ Attach access token
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("access");
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error),
+  (config) => config,
+  (error) => Promise.reject(error)
 );
 
-// ✅ Handle refresh + retry (FIXED)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -36,36 +27,24 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refresh = localStorage.getItem("refresh");
-
-        if (!refresh) throw error;
-
-        const res = await axios.post(
+        // ✅ No need to read refresh from localStorage
+        // The browser sends refresh_token cookie automatically
+        await axios.post(
           `${API_URL}auth/refresh/token/`,
-          { refresh },
+          {},
+          { withCredentials: true } // ✅ ensure cookie is sent
         );
 
-        const newAccess = res.data.access;
-        localStorage.setItem("access", newAccess);
-
-        // 🔥 IMPORTANT FIX: preserve full request
-        return api({
-          ...originalRequest,
-          headers: {
-            ...originalRequest.headers,
-            Authorization: `Bearer ${newAccess}`,
-            "Content-Type": "application/json",
-          },
-        });
+        // ✅ Retry original request — browser sends new access_token cookie
+        return api(originalRequest);
       } catch (err) {
-        localStorage.clear();
         window.location.href = "/login";
         return Promise.reject(err);
       }
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default api;

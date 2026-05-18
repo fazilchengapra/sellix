@@ -18,23 +18,13 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, pass) => {
     try {
-      const response = await api.post("auth/login/", {
+      // Step 1: Login — backend sets access_token & refresh_token as HttpOnly cookies
+      await api.post("auth/login/", {
         email: email,
         password: pass,
       });
 
-      const { access, refresh } = response.data;
-
-      // ✅ store tokens
-      localStorage.setItem("access", access);
-      localStorage.setItem("refresh", refresh);
-
-      // Fetch user profile using the access token
-      const userResponse = await api.get("user/me/", {
-        headers: {
-          Authorization: `Bearer ${access}`,
-        },
-      });
+      const userResponse = await api.get("user/me/");
 
       setUser(userResponse.data);
       localStorage.setItem("user", JSON.stringify(userResponse.data));
