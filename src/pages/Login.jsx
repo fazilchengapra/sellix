@@ -85,7 +85,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {labels.map((e) => (
-            <div>
+            <div key={e.id}>
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 mb-1"

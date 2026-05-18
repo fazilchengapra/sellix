@@ -66,14 +66,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async () => {
+  const logout = async (resetCart) => {
     try {
-        await api.post("auth/logout/");
+      await api.post("auth/logout/");
+      localStorage.removeItem("user");
     } catch (error) {
       console.error("Logout error", error.response?.data || error.message);
     } finally {
       setUser(null);
-      localStorage.removeItem("user");
+      resetCart?.()
     }
   };
 

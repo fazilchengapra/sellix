@@ -67,6 +67,7 @@ function App() {
                   <Route path="/product/:id" element={<ProductDetails />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/cart" element={<Cart />} />
 
                   {/* Public Routes*/}
                   <Route element={<PublicRoute />}>
@@ -84,7 +85,6 @@ function App() {
 
                   {/* Private Routes*/}
                   <Route element={<PrivateRoute />}>
-                    <Route path="/cart" element={<Cart />} />
                     <Route path="/wishlist" element={<Wishlist />} />
                     <Route path="/payment" element={<Payment />} />
                     <Route path="/checkout" element={<Checkout />} />

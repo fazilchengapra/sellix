@@ -167,7 +167,7 @@ const ProductDetails = () => {
           />
 
           <ProductActions
-            onAddToCart={() => handleActions(handleAddToCart)}
+            onAddToCart={() => handleAddToCart()}
             onToggleWishlist={() => handleActions(toggleWishlist)}
             onShare={handleShare}
             isInWishlist={isInWishlist(product.id)}

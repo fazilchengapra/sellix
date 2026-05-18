@@ -9,14 +9,14 @@ import { NavIconLink } from "./navbar/NavIconLink";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
-  const { cart } = useCart();
+  const { cart, resetCart } = useCart();
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
-    logout();
+    logout(resetCart);
     navigate("/login");
     setIsMobileMenuOpen(false);
   };
@@ -25,11 +25,10 @@ const Navbar = () => {
 
   const getNavLinkClass = (path) => {
     const isActive = location.pathname === path;
-    return `text-base font-medium transition-colors relative py-1 ${
-      isActive
-        ? "text-blue-600 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-blue-600 after:rounded-full"
-        : "text-gray-700 hover:text-blue-600"
-    }`;
+    return `text-base font-medium transition-colors relative py-1 ${isActive
+      ? "text-blue-600 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-blue-600 after:rounded-full"
+      : "text-gray-700 hover:text-blue-600"
+      }`;
   };
 
   return (
@@ -58,6 +57,13 @@ const Navbar = () => {
             <Link to="/products" className={getNavLinkClass("/products")}>
               Products
             </Link>
+            {!user && <NavIconLink
+              to="/cart"
+              icon={ShoppingCart}
+              count={cart.length}
+              label="Cart"
+            />}
+
             {user && (
               <Link to="/orders" className={getNavLinkClass("/orders")}>
                 Orders

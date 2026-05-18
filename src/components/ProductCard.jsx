@@ -17,7 +17,6 @@ export const ProductCard = ({ product }) => {
   const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if(!user) return showToast('Please Login and try again', 'warning');
     
     try {
         await addToCart({ 
