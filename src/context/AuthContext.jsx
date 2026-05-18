@@ -68,17 +68,12 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const refresh = localStorage.getItem("refresh");
-      if (refresh) {
-        await api.post("auth/logout/", { refresh });
-      }
+        await api.post("auth/logout/");
     } catch (error) {
       console.error("Logout error", error.response?.data || error.message);
     } finally {
       setUser(null);
       localStorage.removeItem("user");
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
     }
   };
 

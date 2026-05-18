@@ -19,7 +19,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (originalRequest.url.includes("auth/login")) {
+    if (originalRequest.url.includes("auth/login") || originalRequest.url.includes("auth/logout")) {
       return Promise.reject(error);
     }
 
@@ -27,12 +27,10 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // ✅ No need to read refresh from localStorage
-        // The browser sends refresh_token cookie automatically
         await axios.post(
           `${API_URL}auth/refresh/token/`,
           {},
-          { withCredentials: true } // ✅ ensure cookie is sent
+          { withCredentials: true }
         );
 
         // ✅ Retry original request — browser sends new access_token cookie
