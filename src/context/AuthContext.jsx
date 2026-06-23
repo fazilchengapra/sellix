@@ -1,4 +1,5 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 const AuthContext = createContext(undefined);
@@ -6,14 +7,52 @@ const AuthContext = createContext(undefined);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  // Ref to expose navigate to the event listener without stale closures
+  const navigateRef = useRef(navigate);
+  useEffect(() => { navigateRef.current = navigate; }, [navigate]);
 
+  // On mount: verify the session is still valid server-side.
+  // Don't just trust localStorage — cookies may have expired.
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-    }
-    setLoading(false);
+    const verifySession = async () => {
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) {
+        setLoading(false);
+        return;
+      }
+      try {
+        // This call will attempt a token refresh via the interceptor if needed.
+        // If both access + refresh are expired, the interceptor fires softLogout().
+        const userResponse = await api.get("user/me/");
+        setUser(userResponse.data);
+        // Keep localStorage in sync with latest server data
+        localStorage.setItem("user", JSON.stringify(userResponse.data));
+      } catch {
+        // Session is invalid — clear stale data silently.
+        // The interceptor already handled the redirect via softLogout().
+        localStorage.removeItem("user");
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifySession();
+  }, []);
+
+  // Listen for the 'auth:session-expired' event fired by axios.js
+  // and perform a soft React Router redirect — no hard page reload.
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setUser(null);
+      navigateRef.current("/login", { replace: true });
+    };
+
+    window.addEventListener("auth:session-expired", handleSessionExpired);
+    return () => {
+      window.removeEventListener("auth:session-expired", handleSessionExpired);
+    };
   }, []);
 
   const login = async (email, pass) => {
@@ -74,7 +113,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Logout error", error.response?.data || error.message);
     } finally {
       setUser(null);
-      resetCart?.()
+      resetCart?.();
     }
   };
 

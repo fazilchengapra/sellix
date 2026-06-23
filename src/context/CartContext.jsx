@@ -29,7 +29,11 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchCart()
+    if (user) {
+      fetchCart();
+    } else {
+      setCart([]);
+    }
   }, [user]);
 
   const addToCart = async (item) => {
@@ -95,8 +99,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Clears cart state locally only — use after order creation where the
-  // backend has already consumed the cart items.
+  
   const resetCart = () => {
     setCart([])
     console.log('reset...')
