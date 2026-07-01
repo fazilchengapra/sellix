@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
-import { X, LogOut, LayoutDashboard, BarChart2, Package, Users, ShoppingCart } from "lucide-react";
+import { X, LogOut, LayoutDashboard, BarChart2, Package, Users, ShoppingCart, Headphones } from "lucide-react";
 
 const navItems = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
-    { icon: BarChart2, label: "Sales Analytics", path: "/admin/analytics" },
-    { icon: Package, label: "Products", path: "/admin/products" },
-    { icon: Users, label: "Users", path: "/admin/users" },
-    { icon: ShoppingCart, label: "Orders", path: "/admin/orders" },
+    { icon: LayoutDashboard, label: "Dashboard",       path: "/admin" },
+    { icon: BarChart2,       label: "Sales Analytics",  path: "/admin/analytics" },
+    { icon: Package,         label: "Products",          path: "/admin/products" },
+    { icon: Users,           label: "Users",             path: "/admin/users" },
+    { icon: ShoppingCart,    label: "Orders",            path: "/admin/orders" },
+    { icon: Headphones,      label: "Support Tickets",   path: "/admin/tickets" },
 ];
 
 const AdminSidebar = ({ sidebarOpen, setSidebarOpen, isActive, handleLogout }) => {

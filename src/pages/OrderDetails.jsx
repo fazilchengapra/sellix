@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Headphones } from "lucide-react";
 import api from "../api/axios";
 import { Spinner } from "../components/ui/Spinner";
 import OrderStatusTimeline from "../components/order/OrderStatusTimeline";
@@ -12,6 +12,7 @@ import OrderItemsList from "../components/order/OrderItemsList";
 import OrderShippingInfo from "../components/order/OrderShippingInfo";
 import OrderPaymentInfo from "../components/order/OrderPaymentInfo";
 import OrderCostSummary from "../components/order/OrderCostSummary";
+import { useSupportModal } from "../context/SupportContext";
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -23,6 +24,7 @@ const OrderDetails = () => {
   const [saving, setSaving] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const { openSupport } = useSupportModal();
   const { showToast } = useToast();
   const { user } = useAuth();
 
@@ -125,15 +127,27 @@ const OrderDetails = () => {
           </p>
         </div>
 
-        <OrderActions 
-            user={user}
-            order={order}
-            pendingStatus={pendingStatus}
-            setPendingStatus={setPendingStatus}
-            handleSaveStatus={handleSaveStatus}
-            saving={saving}
-            onCancelClick={() => setShowCancelDialog(true)}
-        />
+        <div className="flex items-center gap-3 flex-wrap">
+          <OrderActions 
+              user={user}
+              order={order}
+              pendingStatus={pendingStatus}
+              setPendingStatus={setPendingStatus}
+              handleSaveStatus={handleSaveStatus}
+              saving={saving}
+              onCancelClick={() => setShowCancelDialog(true)}
+          />
+          {!user?.is_staff && (
+            <button
+              id="need-help-btn"
+              onClick={() => openSupport(order)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 text-white text-sm font-semibold shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
+              <Headphones size={15} />
+              Need Help?
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">

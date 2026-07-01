@@ -31,12 +31,14 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminUsers from "./pages/admin/AdminUsers";
 import SalesAnalytics from "./pages/admin/SalesAnalytics";
+import AdminTickets from "./pages/admin/AdminTickets";
 
 // Context Providers
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
 import { ToastProvider } from "./context/ToastContext";
+import { SupportProvider } from "./context/SupportContext";
 
 
 
@@ -44,6 +46,7 @@ function App() {
   return (
     <ToastProvider>
       <AuthProvider>
+        <SupportProvider>
         <CartProvider>
           <WishlistProvider>
             <Routes>
@@ -56,6 +59,7 @@ function App() {
                   <Route path="orders/:id" element={<OrderDetails />} />
                   <Route path="users" element={<AdminUsers />} />
                   <Route path="analytics" element={<SalesAnalytics />} />
+                  <Route path="tickets" element={<AdminTickets />} />
                 </Route>
               </Route>
 
@@ -97,6 +101,7 @@ function App() {
             </Routes>
           </WishlistProvider>
         </CartProvider>
+        </SupportProvider>
       </AuthProvider>
     </ToastProvider>
   );

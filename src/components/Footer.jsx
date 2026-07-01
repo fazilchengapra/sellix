@@ -1,6 +1,9 @@
-import { Facebook, Twitter, Instagram, Linkedin, Heart } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { useSupportModal } from '../context/SupportContext';
 
 const Footer = () => {
+  const { openSupport } = useSupportModal();
+
   return (
     <footer className="bg-white border-t border-gray-200 mt-auto">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -13,7 +16,7 @@ const Footer = () => {
               Your trusted destination for premium products. We deliver quality, style, and exceptional service to customers worldwide.
             </p>
           </div>
-          
+
           <div>
             <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">Shop</h3>
             <ul className="space-y-3">
@@ -23,20 +26,29 @@ const Footer = () => {
             </ul>
           </div>
 
+          {/* Help Center */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">Support</h3>
+            <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">Help Center</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Contact Us</a></li>
+              <li>
+                <button
+                  id="footer-contact-support-btn"
+                  onClick={() => openSupport(null)}
+                  className="text-gray-600 hover:text-blue-600 transition-colors text-left"
+                >
+                  Chat with us
+                </button>
+              </li>
               <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Shipping Info</a></li>
-              <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Returns</a></li>
+              <li><a href="#" className="text-gray-600 hover:text-blue-600 transition-colors">Returns & Refunds</a></li>
             </ul>
           </div>
         </div>
-        
+
         <div className="mt-12 pt-8 border-t border-gray-200">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-600 text-sm flex items-center text-center">
-              &copy; 2026 Sellix. all right received
+              &copy; 2026 Sellix. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <a href="#" className="text-gray-400 hover:text-blue-600 transition-colors">
@@ -60,3 +72,4 @@ const Footer = () => {
 };
 
 export default Footer;
+
