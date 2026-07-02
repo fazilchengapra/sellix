@@ -89,6 +89,9 @@ const SupportTicketModal = ({ isOpen, onClose, order }) => {
               error={m.error} sending={m.sending} ticketAction={m.ticketAction} isTicketOpen={m.isTicketOpen}
               loadThread={m.loadThread} onSend={m.handleSend} onKeyDown={m.handleKeyDown}
               onClose={m.handleCloseTicket} onReopen={m.handleReopen}
+              stagingAttachments={m.stagingAttachments} uploadError={m.uploadError}
+              fileInputRef={m.fileInputRef} onFilePick={m.handleFilePick}
+              onRemoveAttachment={m.removeStagingAttachment}
             />
           )}
 

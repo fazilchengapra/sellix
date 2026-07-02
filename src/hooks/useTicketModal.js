@@ -20,11 +20,14 @@ export function useTicketModal({ isOpen, onClose, order }) {
   const [ticketAction, setTicketAction]       = useState(false);
   const [error, setError]                     = useState(null);
   const [wsConnected, setWsConnected]         = useState(false);
+  const [stagingAttachments, setStagingAttachments] = useState([]); // File objects awaiting send
+  const [uploadError, setUploadError]         = useState(null);
 
-  const messagesEndRef = useRef(null);
-  const inputRef       = useRef(null);
-  const subjectRef     = useRef(null);
-  const wsRef          = useRef(null);
+  const messagesEndRef  = useRef(null);
+  const inputRef        = useRef(null);
+  const subjectRef      = useRef(null);
+  const wsRef           = useRef(null);
+  const fileInputRef    = useRef(null);
 
   useEffect(() => { setSelectedOrder(order ?? null); }, [order]);
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
@@ -51,7 +54,8 @@ export function useTicketModal({ isOpen, onClose, order }) {
     closeWs();
     setStep('select'); setSelectedCategory(null); setSubject('');
     setSelectedOrder(order ?? null); setTicket(null);
-    setMessages([]); setTickets([]); setInputValue(''); setError(null);
+    setMessages([]); setTickets([]); setInputValue('');
+    setError(null); setStagingAttachments([]); setUploadError(null);
   };
 
   const handleClose = () => { onClose(); setTimeout(reset, 300); };
@@ -87,11 +91,26 @@ export function useTicketModal({ isOpen, onClose, order }) {
         try {
           const msg = JSON.parse(e.data);
           if (msg.type !== 'ticket.message') return;
-          const normalized = { id: msg.message_id, message: msg.message, is_staff_reply: msg.is_staff_reply, created_at: msg.created_at };
+          const normalized = {
+            id: msg.message_id,
+            message: msg.message,
+            is_staff_reply: msg.is_staff_reply,
+            created_at: msg.created_at,
+            // include attachments from the WS frame if the server sends them
+            attachments: Array.isArray(msg.attachments) ? msg.attachments : undefined,
+          };
           setMessages((prev) => {
             if (prev.some((m) => m.id === normalized.id)) return prev;
             const tempIdx = prev.findLastIndex?.((m) => String(m.id).startsWith('temp-'));
-            if (tempIdx !== -1) { const next = [...prev]; next[tempIdx] = normalized; return next; }
+            if (tempIdx !== -1) {
+              const next = [...prev];
+              // If WS frame has no attachments, keep the ones from the optimistic temp message
+              next[tempIdx] = {
+                ...normalized,
+                attachments: normalized.attachments ?? prev[tempIdx].attachments,
+              };
+              return next;
+            }
             return [...prev, normalized];
           });
         } catch { /* ignore malformed frames */ }
@@ -113,17 +132,84 @@ export function useTicketModal({ isOpen, onClose, order }) {
     finally { setCreating(false); }
   };
 
+  /**
+   * Upload staged files to /tickets/{id}/attachment/ and return an array of
+   * { file_url, cloudinary_public_id } objects from the API response.
+   */
+  const uploadAttachments = async (ticketId) => {
+    if (!stagingAttachments.length) return [];
+    setUploadError(null);
+    const form = new FormData();
+    stagingAttachments.forEach((file) => form.append('attachments', file));
+    try {
+      const res = await api.post(`/tickets/${ticketId}/attachment/`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return res.data.data ?? [];
+    } catch {
+      setUploadError('Failed to upload attachment(s). Please try again.');
+      return null; // null signals failure
+    }
+  };
+
+  const removeStagingAttachment = (index) =>
+    setStagingAttachments((prev) => prev.filter((_, i) => i !== index));
+
+  const handleFilePick = (e) => {
+    const picked = Array.from(e.target.files ?? []);
+    setStagingAttachments((prev) => [...prev, ...picked]);
+    // Reset the input so the same file can be re-added after removal
+    e.target.value = '';
+  };
+
   const handleSend = async () => {
     const trimmed = inputValue.trim();
-    if (!trimmed || sending || !ticket?.id) return;
-    const tempMsg = { id: `temp-${Date.now()}`, message: trimmed, is_staff_reply: false, created_at: new Date().toISOString() };
+    const hasFiles = stagingAttachments.length > 0;
+    if ((!trimmed && !hasFiles) || sending || !ticket?.id) return;
+
+    setSending(true);
+    setUploadError(null);
+
+    // 1. Upload any staged attachments first
+    let uploadedAttachments = [];
+    if (hasFiles) {
+      const result = await uploadAttachments(ticket.id);
+      if (result === null) { setSending(false); return; } // upload failed
+      uploadedAttachments = result;
+    }
+
+    // Clear staged files now that they're uploaded
+    setStagingAttachments([]);
+
+    // 2. Build an optimistic temp message (with attachment previews)
+    const attachmentUrls = uploadedAttachments.map((a) => a.file_url);
+    const tempMsg = {
+      id: `temp-${Date.now()}`,
+      message: trimmed || '',
+      is_staff_reply: false,
+      created_at: new Date().toISOString(),
+      attachments: uploadedAttachments,
+    };
     setMessages((prev) => [...prev, tempMsg]);
     setInputValue('');
-    if (wsRef.current?.readyState === WebSocket.OPEN) { wsRef.current.send(JSON.stringify({ message: trimmed })); return; }
-    setSending(true);
-    try   { await api.post(`/tickets/${ticket.id}/replay/`, { message: trimmed, attachments: [] }); await loadThread(ticket.id); }
-    catch { setMessages((prev) => prev.filter((m) => m.id !== tempMsg.id)); setInputValue(trimmed); setError('Failed to send message.'); }
-    finally { setSending(false); }
+
+    // 3. Send the message text (with attachment references) over WS or REST
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ message: trimmed, attachments: uploadedAttachments }));
+      setSending(false);
+      return;
+    }
+
+    try {
+      await api.post(`/tickets/${ticket.id}/replay/`, { message: trimmed, attachments: attachmentUrls });
+      await loadThread(ticket.id);
+    } catch {
+      setMessages((prev) => prev.filter((m) => m.id !== tempMsg.id));
+      setInputValue(trimmed);
+      setError('Failed to send message.');
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleTicketAction = async (action) => {
@@ -153,14 +239,17 @@ export function useTicketModal({ isOpen, onClose, order }) {
     // state
     step, selectedCategory, subject, setSubject, selectedOrder, setSelectedOrder,
     ticket, messages, tickets, inputValue, setInputValue,
-    creating, sending, loadingMsgs, loadingTickets, ticketAction, error, wsConnected,
+    creating, sending, loadingMsgs, loadingTickets, ticketAction,
+    error, wsConnected,
+    stagingAttachments, uploadError,
     // refs
-    messagesEndRef, inputRef, subjectRef,
+    messagesEndRef, inputRef, subjectRef, fileInputRef,
     // computed
     needsOrder, orderLocked, showOrderPicker, orderMissing, canCreate, isTicketOpen,
     // actions
     handleClose, goBack, goToList, loadTickets, loadThread,
     handleCreate, handleSend, handleKeyDown,
+    handleFilePick, removeStagingAttachment,
     handleCloseTicket: () => handleTicketAction('close'),
     handleReopen:      () => handleTicketAction('re-open'),
     openTicketFromList, selectCategory,
