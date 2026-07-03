@@ -1,8 +1,13 @@
 import { ChevronRight } from 'lucide-react';
 import { ORDER_REQUIRED_KEYS } from '../../../constants/support.constants';
 
-export function CategoryCard({ cat, onClick }) {
+export function CategoryCard({ cat, onClick, user }) {
   const Icon = cat.icon;
+  
+  if (cat.anonymous_allow === false && !user) {
+    return
+  }
+  
   return (
     <button
       onClick={() => onClick(cat)}

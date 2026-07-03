@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import api from '../api/axios';
 import { useToast } from '../context/ToastContext';
 import { CATEGORY_META } from '../constants/adminTickets.constants';
+import { CgAttachment } from 'react-icons/cg';
 
 export function useAdminTickets() {
   const [tickets, setTickets]           = useState([]);
@@ -65,7 +66,8 @@ export function useAdminTickets() {
       try {
         const msg = JSON.parse(e.data);
         if (msg.type !== 'ticket.message') return;
-        const normalized = { id: msg.message_id, message: msg.message, is_staff_reply: msg.is_staff_reply, created_at: msg.created_at };
+        console.log('Received WS message:', msg);
+        const normalized = { id: msg.message_id, message: msg.message, is_staff_reply: msg.is_staff_reply, created_at: msg.created_at, attachments: msg.attachments ?? [] };
         setMessages((prev) => {
           if (prev.some((m) => m.id === normalized.id)) return prev;
           const tempIdx = prev.findLastIndex?.((m) => String(m.id).startsWith('temp-'));

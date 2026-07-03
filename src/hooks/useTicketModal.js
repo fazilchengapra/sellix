@@ -199,17 +199,7 @@ export function useTicketModal({ isOpen, onClose, order }) {
       setSending(false);
       return;
     }
-
-    try {
-      await api.post(`/tickets/${ticket.id}/replay/`, { message: trimmed, attachments: attachmentUrls });
-      await loadThread(ticket.id);
-    } catch {
-      setMessages((prev) => prev.filter((m) => m.id !== tempMsg.id));
-      setInputValue(trimmed);
-      setError('Failed to send message.');
-    } finally {
-      setSending(false);
-    }
+    setSending(false);
   };
 
   const handleTicketAction = async (action) => {
