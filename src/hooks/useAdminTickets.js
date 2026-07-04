@@ -58,7 +58,7 @@ export function useAdminTickets() {
     wsRef.current = null;
     setWsConnected(false);
 
-    const ws = new WebSocket(`ws://localhost:8000/ws/tickets/${id}/`);
+    const ws = new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}/ws/tickets/${id}/`);
     ws.onopen  = () => setWsConnected(true);
     ws.onerror = () => setWsConnected(false);
     ws.onclose = () => setWsConnected(false);
