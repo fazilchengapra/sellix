@@ -83,7 +83,7 @@ export function useTicketModal({ isOpen, onClose, order }) {
       setMessages(data.messages ?? []);
       closeWs();
 
-      const ws = new WebSocket(`ws://localhost:8000/ws/tickets/${id}/`);
+      const ws = new WebSocket(`${import.meta.env.VITE_WS_BASE_URL}/ws/tickets/${id}/`);
       ws.onopen    = () => { setWsConnected(true); setError(null); };
       ws.onerror   = () => { setError('Connection error. Messages may be delayed.'); setWsConnected(false); };
       ws.onclose   = () => setWsConnected(false);
